@@ -7,7 +7,7 @@ import Dashboard from './Pages/Dashboard';
 import Events from './Pages/Events';
 import Employees from './Pages/Employees';
 import Transactions from './Pages/Transactions';
-import Logout from './Pages/Profile';
+import Profile from './Pages/Profile';
 import EventDetails from './Pages/EventDetails';
 
 const router = createBrowserRouter(
