@@ -1,6 +1,6 @@
 import React from 'react';
 import { useParams } from 'react-router-dom';
-import events from '../data/events.json';  
+import events from '../Data/Events.json';  
 
 const EventDetails = () => {
   const { eventId } = useParams();

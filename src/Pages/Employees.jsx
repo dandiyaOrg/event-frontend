@@ -1,6 +1,6 @@
 import React from 'react';
 import EmployeeCard from '../Components/EmployeeCard';
-import employees from '../data/employees.json';
+import employees from '../Data/Employees.json';
 
 function Employees() {
   const handleAddEmployee = () => {

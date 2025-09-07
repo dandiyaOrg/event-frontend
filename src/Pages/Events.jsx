@@ -1,7 +1,7 @@
 import React from 'react';
 import { Outlet,Link } from 'react-router-dom';
 import EventCard from '../Components/EventCard';  
-import events from '../data/events.json';         
+import events from '../Data/Events.json';         
 
 function Events() {
   const handleAddEvent = () => {
