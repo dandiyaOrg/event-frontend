@@ -1,6 +1,7 @@
-import { FaBars } from 'react-icons/fa';
-import { BsBell } from 'react-icons/bs';
-import { MdDarkMode } from 'react-icons/md';
+import { FaBars } from "react-icons/fa";
+import { BsBell } from "react-icons/bs";
+import { MdDarkMode } from "react-icons/md";
+import { Link } from "react-router-dom";
 
 const Navbar = () => (
   <nav className="w-full bg-white shadow flex items-center justify-between px-6 py-4">
@@ -21,15 +22,14 @@ const Navbar = () => (
       <button className="text-xl text-gray-600 hover:text-gray-900">
         <BsBell />
       </button>
-      <div className="flex items-center gap-2">
-        {/* User name and avatar */}
+      <Link to="/profile" className="flex items-center gap-2 cursor-pointer">
         <span className="text-gray-800 font-medium">Alison</span>
         <img
           src="https://randomuser.me/api/portraits/men/1.jpg"
           alt="User"
           className="w-8 h-8 rounded-full object-cover"
         />
-      </div>
+      </Link>
     </div>
   </nav>
 );
