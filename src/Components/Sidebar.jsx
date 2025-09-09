@@ -2,16 +2,21 @@ import React, { useState } from "react";
 import Navbar from "../Components/Navbar";
 import { Outlet, NavLink } from "react-router-dom";
 import { IoMdMenu } from "react-icons/io";
+import { FaBars } from "react-icons/fa";
 import { AiOutlineClose } from "react-icons/ai";
 import {
   MdOutlineDashboard,
   MdOutlineEmojiEvents,
-  MdLogout,
 } from "react-icons/md";
 import { GrUserWorker, GrTransaction } from "react-icons/gr";
+import { useSelector } from "react-redux";
 
 function Sidebar() {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const darkMode = useSelector((state) => state.theme.darkMode);
+  const isCollapsed = useSelector((state) => state.collapsed.isCollapsed);
+
+  const [sidebarOpen, setSidebarOpen] = useState(false); 
+  
 
   const navButtons = [
     {
@@ -38,30 +43,48 @@ function Sidebar() {
       iconLink: <GrTransaction className="text-2xl" />,
       notification: false,
     },
-    {
-      text: "Logout",
-      to: "/logout",
-      iconLink: <MdLogout className="text-2xl" />,
-      notification: false,
-    },
   ];
+
+  const sidebarBackground = darkMode ? "bg-gray-900 text-gray-300 shadow-black/40" : "bg-white text-gray-700 shadow-blue-gray-900/5";
+  const sidebarOpenClasses = sidebarOpen
+  ? "translate-x-0 w-64 p-4"
+  : "-translate-x-full md:translate-x-0";
+  const sidebarCollapsedClasses = isCollapsed ? "md:w-20 md:p-2" : "md:w-64";
+  const sidebarPositionClasses = "md:sticky top-[2.5rem]";
+
+  const getNavLinkClasses = (isActive) => {
+    if (isActive) {
+      return darkMode
+        ? "bg-gray-700 text-gray-200"
+        : "bg-gray-200 text-gray-900";
+    } else {
+      return darkMode
+        ? "hover:bg-gray-800 hover:text-gray-300 focus:bg-gray-800 focus:text-gray-300 active:bg-gray-700 active:text-gray-200"
+        : "hover:bg-blue-50 hover:bg-opacity-80 focus:bg-blue-50 focus:bg-opacity-80 active:bg-gray-50 active:bg-opacity-80 hover:text-gray-700 focus:text-gray-700 active:text-gray-900";
+    }
+  };
+  {console.log(isCollapsed);
+  }
 
   return (
     <>
-      {/* Header */}
-      <Navbar />
-
-      {/* Main layout */}
-      <div className="flex h-[calc(100vh-2.5rem)]">
-        {/* Sidebar */}
-        <nav
-          className={`fixed md:sticky top-[2.5rem] left-0 bg-white text-gray-700 h-[calc(100vh-2.5rem)] max-w-[17rem] w-full p-4 shadow-2xl shadow-blue-gray-900/5 overflow-y-auto transform md:transform-none transition-transform duration-300 ease-in-out z-40
-          ${
-            sidebarOpen ? "translate-x-0" : "-translate-x-full"
-          } md:translate-x-0
-          `}
+      <Navbar>
+        <button
+          onClick={() => setSidebarOpen(!sidebarOpen)}
+          className={`text-3xl ${darkMode ? "text-gray-300" : "text-gray-700"} md:hidden p-1 rounded hover:bg-gray-200 hover:bg-opacity-30`}
+          aria-label="Toggle sidebar"
         >
-          <div className="flex flex-col gap-1 min-w-[240px] p-2 font-sans text-base font-normal text-gray-700">
+          {sidebarOpen ? <AiOutlineClose /> : <FaBars />}
+        </button>
+      </Navbar>
+
+      <div className="flex h-[calc(100vh-2.5rem)]">
+        <nav
+          className={`fixed top-[2.5rem] left-0 h-[calc(100vh-2.5rem)] overflow-y-auto shadow-2xl shadow-blue-gray-900/5 z-40 ${sidebarBackground} ${sidebarOpenClasses} ${sidebarPositionClasses} ${sidebarCollapsedClasses}`}
+        >
+          
+
+          <div className="flex flex-col gap-1 font-sans text-base font-normal">
             {navButtons.map((button, index) => (
               <NavLink
                 to={button.to}
@@ -69,34 +92,20 @@ function Sidebar() {
                 role="button"
                 tabIndex="0"
                 className={({ isActive }) =>
-                  `flex items-center w-full p-3 rounded-lg text-start leading-tight transition-all hover:bg-blue-50 hover:bg-opacity-80 focus:bg-blue-50 focus:bg-opacity-80 active:bg-gray-50 active:bg-opacity-80
-                   ${
-                     isActive
-                       ? "bg-gray-200 text-gray-900"
-                       : "hover:text-gray-700 focus:text-gray-700 active:text-gray-900"
-                   }
-                   outline-none`
+                  `flex items-center w-full p-3 rounded-lg text-start leading-tight transition-all outline-none ${getNavLinkClasses(isActive)}`
                 }
-                onClick={() => setSidebarOpen(false)} // close sidebar on click (mobile)
+                onClick={() => setSidebarOpen(false)}
               >
-                <div className="grid place-items-center mr-4">
+                <div className={`grid place-items-center mr-4 ${darkMode ? "text-gray-300" : "text-gray-700"}`}>
                   {button.iconLink}
                 </div>
-                {button.text}
-                {button.notification && (
-                  <div className="grid place-items-center ml-auto justify-self-end">
-                    <div className="relative grid items-center font-sans font-bold uppercase whitespace-nowrap select-none bg-blue-500/20 text-blue-900 py-1 px-2 text-xs rounded-full">
-                      <span>14</span>
-                    </div>
-                  </div>
-                )}
+                {(sidebarOpen || !isCollapsed) && button.text}
               </NavLink>
             ))}
           </div>
         </nav>
 
-        {/* Main content */}
-        <main className="flex-1 overflow-auto px-4 sm:px-8 py-4">
+        <main className={`flex-1 overflow-auto px-4 sm:px-8 py-4 ${darkMode ? "bg-gray-900 text-gray-300" : "bg-gray-50 text-gray-900"}`}>
           <Outlet />
         </main>
       </div>
