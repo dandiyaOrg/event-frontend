@@ -1,83 +1,80 @@
-import {
-  MdOutlineEmojiEvents,
-  MdOutlineAccessTime,
-  MdOutlineLocationOn,
-  MdOutlineEventNote,
-  MdAttachMoney,
-  MdBusiness,
-  MdDescription,
-} from "react-icons/md";
-import { useSelector } from "react-redux";
-import { FaRegCalendarAlt } from "react-icons/fa";
-import { FaIndianRupeeSign } from "react-icons/fa6";
+import React from "react";
 
 const EventCard = ({
-  image,
-  title,
-  date,
-  time,
+  eventNumber,
+  eventName,
+  startDate,
+  endDate,
   venue,
-  location,
-  price,
-  organizer,
+  days,
+  imageUrl,
+  eventLink,
   description,
 }) => {
-  const darkMode = useSelector((state) => state.theme.darkMode);
-
   return (
-    <div
-      className={`max-w-sm rounded-lg shadow-md border p-4 h-[550px] flex flex-col
-        ${darkMode ? "bg-gray-800 border-gray-700 text-gray-200" : "bg-white border-gray-100 text-gray-900"}
-      `}
-    >
-      <img
-        src={image}
-        alt={title}
-        className="h-48 w-full object-cover rounded-md mb-4 flex-shrink-0"
-      />
-      <div className="space-y-2 flex flex-col flex-grow overflow-hidden">
-        <div className="flex items-center gap-2">
-          <MdOutlineEmojiEvents className={darkMode ? "text-gray-300" : "text-gray-600"} />
-          <span className="font-semibold">{title}</span>
+    <div className="flex rounded-2xl shadow-lg bg-gray-100 p-6 w-full max-w-6xl">
+      {/* Image Section */}
+      <div className="w-1/4 flex items-center justify-center">
+        <div className="w-full aspect-square rounded-xl bg-gray-300 flex items-center justify-center text-gray-500 text-2xl font-semibold overflow-hidden">
+          {imageUrl ? (
+            <img
+              src={imageUrl}
+              alt="Event"
+              className="object-cover w-full h-full rounded-xl"
+            />
+          ) : (
+            "Image"
+          )}
         </div>
-
-        <div className="flex items-center gap-2">
-          <FaRegCalendarAlt className={darkMode ? "text-gray-300" : "text-gray-600"} />
-          <span>{date}</span>
+      </div>
+      {/* Details Section */}
+      <div className="w-3/4 pl-8 flex flex-col justify-between">
+        {/* Top Info */}
+        <div>
+          <div className="text-xs text-gray-500 font-mono tracking-wider mb-1">
+            EVENT NUMBER - {eventNumber}
+          </div>
+          <div className="text-2xl font-semibold text-gray-800 mb-3">
+            {eventName}
+          </div>
+          <div className="flex flex-wrap gap-x-16 text-lg text-gray-600 mb-2">
+            <div>Start date: 
+              <br />
+              <span className="text-gray-700 text-sm font-medium">{startDate}</span>
+              </div>
+            <div>End date:
+              <br />
+              <span className="text-gray-700 text-sm font-medium">{endDate}</span>
+            </div>
+            <div>
+              Venue
+              <br />
+              <span className="text-gray-700 text-sm font-medium">{venue}</span>
+            </div>
+            <div>
+              Number of days
+              <br />
+              <span className="text-gray-700 text-sm font-medium">{days}</span>
+            </div>
+          </div>
+          <div className="text-sm mt-2 text-gray-600 mb-4">
+            Event Link -{" "}
+            <a
+              href={eventLink}
+              className="text-blue-500 underline"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {eventLink}
+            </a>
+          </div>
         </div>
-
-        <div className="flex items-center gap-2">
-          <MdOutlineAccessTime className={darkMode ? "text-gray-300" : "text-gray-600"} />
-          <span>{time}</span>
-        </div>
-
-        <div className="flex items-center gap-2">
-          <MdOutlineEventNote className={darkMode ? "text-gray-300" : "text-gray-600"} />
-          <span>{venue}</span>
-        </div>
-
-        <div className="flex items-center gap-2">
-          <MdOutlineLocationOn className={darkMode ? "text-gray-300" : "text-gray-600"} />
-          <span>{location}</span>
-        </div>
-
-        <div className="flex items-center gap-2">
-          <FaIndianRupeeSign className={darkMode ? "text-gray-300" : "text-gray-600"} />
-          <span>{price}</span>
-        </div>
-
-        <div className="flex items-center gap-2">
-          <MdBusiness className={darkMode ? "text-gray-300" : "text-gray-600"} />
-          <span>{organizer}</span>
-        </div>
-
-        <div
-          className={`flex items-center leading-snug gap-2 overflow-auto mt-auto whitespace-normal ${
-            darkMode ? "text-gray-300" : "text-gray-700"
-          }`}
-        >
-          <MdDescription className={`${darkMode ? "text-gray-300" : "text-gray-600"} mt-1 shrink-0`} />
-          <span>{description}</span>
+        {/* Description */}
+        <div className="mt-2 rounded-xl bg-gray-200 p-4">
+          <div className="text-lg font-semibold text-gray-700 mb-2">
+            Description
+          </div>
+          <div className="text-gray-600 text-sm">{description}</div>
         </div>
       </div>
     </div>
@@ -85,6 +82,3 @@ const EventCard = ({
 };
 
 export default EventCard;
-
-
-

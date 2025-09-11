@@ -44,7 +44,7 @@ const ProfileSidebar = () => {
         onClick={() => setActive("profile")}
       >
         <MdPerson className={`text-xl ${active === "profile" ? "text-gray-200" : "text-gray-500"}`} />
-        <span>{darkMode ? "text-gray-200" : "text-gray-700"}</span>
+        
         <span className={`${darkMode ? "text-gray-200" : "text-gray-700"}`}>Profile</span>
       </div>
       <div

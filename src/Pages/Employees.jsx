@@ -1,40 +1,91 @@
-import React from 'react';
-import EmployeeCard from '../Components/EmployeeCard';
-import employees from '../Data/Employees.json';
+import employees from "../Data/Employees.json";
+import SearchBar from "../Components/SearchBar";
+import CustomizableTable from "../Components/CustomizableTable";
 
-function Employees() {
+const employeeData = [
+  {
+    id: 1,
+    name: "Ravi Mehra",
+    username: "ravi.mehra",
+    mobileNumber: "+91 8884442211",
+    emailId: "ravi.mehra@company.com",
+    password: "********",
+   
+  },
+  {
+    id: 2,
+    name: "Anjali Kulkarni",
+    username: "anjali.k",
+    mobileNumber: "+91 9023445566",
+    emailId: "anjali.kulkarni@company.com",
+    password: "********",
+   
+  },
+  {
+    id: 3,
+    name: "Deepak Singh",
+    username: "deepak.singh",
+    mobileNumber: "+91 9811122233",
+    emailId: "deepak.singh@company.com",
+    password: "********",
+    
+  },
+  {
+    id: 4,
+    name: "Kavita Sethi",
+    username: "kavita.s",
+    mobileNumber: "+91 9430111122",
+    emailId: "kavita.sethi@company.com",
+    password: "********",
+    
+  },
+];
+
+const employeeColumns = [
+  { key: "name", label: "Name" },
+  { key: "username", label: "Username" },
+  { key: "mobileNumber", label: "Mobile Number" },
+  { key: "emailId", label: "Email Id" },
+  { key: "password", label: "Password" },
+  
+];
+
+const EmployeePage = () => {
   const handleAddEmployee = () => {
-    // Logic to open modal or navigate to add employee page
-    alert('Add New Employee clicked!');
+    console.log("Add Employee button clicked");
   };
 
   return (
-    <div className="p-4 sm:p-6 md:p-8 lg:p-10 xl:p-12 max-w-[1280px] mx-auto">
-      <div className="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
-        <h2 className="text-2xl font-semibold">Employees</h2>
+    <div className="px-8 min-h-screen bg-gray-50 space-y-8">
+      {/* Header */}
+      <div>
+        <h1 className="text-4xl font-extrabold text-gray-800 tracking-tight">
+          Employees
+        </h1>
+      </div>
+
+      {/* Controls */}
+      <div className="flex justify-between items-center">
+        <SearchBar placeholder="Search events..." className="w-60" />
         <button
+          className="border border-gray-400 bg-gray-200 text-gray-700 font-medium rounded-xl px-5 py-2 shadow hover:bg-gray-300 hover:border-gray-500 transition-all"
           onClick={handleAddEmployee}
-          className="bg-gray-600 text-white py-2 px-4 rounded hover:bg-gray-400 transition w-full md:w-auto"
         >
-          Add New Employee
+          + New Employee
         </button>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-        {employees.map(employee => (
-          <EmployeeCard
-            key={employee.id}
-            image={employee.image}
-            name={employee.name}
-            role={employee.role}
-            email={employee.email}
-            mobile={employee.mobile}
-            description={employee.description}
-          />
-        ))}
-      </div>
-    </div>
-  );
-}
+      {/* Table */}
 
-export default Employees;
+     
+          <CustomizableTable
+            data={employeeData}
+            allColumns={employeeColumns}
+            rowsPerPageOptions={[5, 10, 25]}
+          />
+        </div>
+     
+  );
+};
+
+export default EmployeePage;

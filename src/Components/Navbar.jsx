@@ -15,6 +15,8 @@ import { toggleCollapse } from '../features/CollapsedSlice';
 
 const Navbar = ({ isClicked, setIsClicked }) => {
   const isLogin = useSelector((state) => state.auth.isLogin);
+const user = useSelector((state) => state.auth.user);  // select logged-in user
+
   const isCollapsed = useSelector((state) => state.collapsed.isCollapsed);
 
   const dispatch = useDispatch();
@@ -22,13 +24,14 @@ const Navbar = ({ isClicked, setIsClicked }) => {
   const [showLogin, setShowLogin] = useState(false);
 
   const handleLogin = () => {
-    dispatch(login());
+    dispatch(login(userObject));
+
   };
 
   // Conditional classes for light/dark mode
-  const navClasses = `w-full shadow flex items-center justify-between px-6 py-4 ${
+  const navClasses = `w-full shadow flex items-center justify-between px-6 py-1  ${
     darkMode ? "bg-gray-900 text-gray-200" : "bg-white text-gray-800"
-  }`;
+  } transition-all duration-300`;
 
   const buttonClasses = `text-xl cursor-pointer hover:text-gray-400 ${
     darkMode ? "text-gray-300" : "text-gray-600"
@@ -44,7 +47,7 @@ const Navbar = ({ isClicked, setIsClicked }) => {
     <>
       <nav className={navClasses}>
         <div className="flex items-center gap-6">
-          <h1 className={`text-2xl font-bold tracking-wide ${darkMode ? "text-[#a7ad3d]" : "text-[#7A7F17]"}`}>
+          <h1 className={`text-2xl font-bold tracking-wide ${darkMode ? "text-gray-300" : "text-gray-800"}`}>
             EMS
           </h1>
           <div className="hidden md:flex justify-center mb-4">
@@ -75,24 +78,18 @@ const Navbar = ({ isClicked, setIsClicked }) => {
             <BsBell />
           </button>
 
-          {isLogin ? (
+         
             <Link to="/profile" className="flex items-center gap-2 cursor-pointer">
-              <span className={`${darkMode ? "text-gray-200" : "text-gray-800"} font-medium`}>Alison</span>
-              <img
-                src="https://randomuser.me/api/portraits/men/1.jpg"
-                alt="User"
-                className="w-8 h-8 rounded-full object-cover"
-              />
-            </Link>
-          ) : (
-            <button
-              onClick={() => setShowLogin(true)}
-              className={loginButtonClasses}
-              aria-label="Open login popup"
-            >
-              Log In
-            </button>
-          )}
+    <span className={`${darkMode ? "text-gray-200" : "text-gray-800"} font-medium`}>
+      {user.firstName || user.name || "User"}
+    </span>
+    <img
+      src={user.avatar || "https://randomuser.me/api/portraits/men/1.jpg"} // fallback avatar
+      alt="User"
+      className="w-8 h-8 rounded-full object-cover"
+    />
+  </Link>
+
         </div>
       </nav>
 

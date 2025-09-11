@@ -4,6 +4,9 @@ import { Outlet, NavLink } from "react-router-dom";
 import { IoMdMenu } from "react-icons/io";
 import { FaBars } from "react-icons/fa";
 import { AiOutlineClose } from "react-icons/ai";
+import { RiBillLine } from "react-icons/ri";
+import { MdPeopleAlt ,MdOutlineShoppingCart } from "react-icons/md";
+
 import {
   MdOutlineDashboard,
   MdOutlineEmojiEvents,
@@ -43,6 +46,21 @@ function Sidebar() {
       iconLink: <GrTransaction className="text-2xl" />,
       notification: false,
     },
+    {
+      text: "Billing Users",
+      to: "/billingUsers",
+      iconLink: <RiBillLine className="text-2xl" />,
+      notification: false,},
+    {
+      text: "Attendee",
+      to: "/attendee",
+      iconLink: <MdPeopleAlt className="text-2xl" />,
+      notification: false,},
+    {
+      text: "Orders",
+      to: "/orders",
+      iconLink: <MdOutlineShoppingCart  className="text-2xl" />,
+      notification: false,}
   ];
 
   const sidebarBackground = darkMode ? "bg-gray-900 text-gray-300 shadow-black/40" : "bg-white text-gray-700 shadow-blue-gray-900/5";
@@ -71,20 +89,27 @@ function Sidebar() {
       <Navbar>
         <button
           onClick={() => setSidebarOpen(!sidebarOpen)}
-          className={`text-3xl ${darkMode ? "text-gray-300" : "text-gray-700"} md:hidden p-1 rounded hover:bg-gray-200 hover:bg-opacity-30`}
+          className={` text-3xl ${darkMode ? "text-gray-300" : "text-gray-700"} md:hidden p-1 rounded hover:bg-gray-200 hover:bg-opacity-30 `}
           aria-label="Toggle sidebar"
         >
           {sidebarOpen ? <AiOutlineClose /> : <FaBars />}
         </button>
       </Navbar>
 
-      <div className="flex h-[calc(100vh-2.5rem)]">
+      <div className="flex h-[calc(100vh-2.5rem)] ">
         <nav
-          className={`fixed top-[2.5rem] left-0 h-[calc(100vh-2.5rem)] overflow-y-auto shadow-2xl shadow-blue-gray-900/5 z-40 ${sidebarBackground} ${sidebarOpenClasses} ${sidebarPositionClasses} ${sidebarCollapsedClasses}`}
+           className={`fixed top-[2.5rem] left-0 h-[calc(100vh-2.5rem)] overflow-y-auto shadow-2xl shadow-blue-gray-900/5 z-40 
+    ${sidebarBackground} 
+    ${sidebarOpenClasses} 
+    ${sidebarPositionClasses} 
+    ${sidebarCollapsedClasses} 
+
+    transition-transform transition-width duration-300 ease-in-out
+  `}
         >
           
 
-          <div className="flex flex-col gap-1 font-sans text-base font-normal">
+          <div className="flex flex-col  font-sans text-base font-normal">
             {navButtons.map((button, index) => (
               <NavLink
                 to={button.to}
@@ -92,7 +117,7 @@ function Sidebar() {
                 role="button"
                 tabIndex="0"
                 className={({ isActive }) =>
-                  `flex items-center w-full p-3 rounded-lg text-start leading-tight transition-all outline-none ${getNavLinkClasses(isActive)}`
+                  `flex items-center w-full p-3 bg  rounded-lg text-start leading-tight transition-all outline-none ${getNavLinkClasses(isActive)}`
                 }
                 onClick={() => setSidebarOpen(false)}
               >
