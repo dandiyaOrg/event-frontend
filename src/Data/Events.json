@@ -1,22 +1,24 @@
 [
   {
     "eventNumber": "1",
+    "status":"active",
     "eventName": "Dandiya Night",
     "startDate": "2024-10-05",
-    "endDate": "2024-10-05",
+    "endDate": "2024-10-14",
     "venue": "Shree Hari Party Plot, Ahmedabad, India",
-    "days": 1,
+    "days": 9,
     "imageUrl": "https://wanderon-images.gumlet.io/blogs/new/2025/01/21/dandiya-nights.jpg",
     "eventLink": "#",
     "description": "Celebrate the vibrant Navratri traditions with music, dance and delicious food at Dandiya Night."
   },
   {
     "eventNumber": "2",
+    "status":"active",
     "eventName": "Holi Festival Celebration",
     "startDate": "2025-03-10",
-    "endDate": "2025-03-10",
+    "endDate": "2025-03-11",
     "venue": "Lalbagh Grounds, Bangalore, India",
-    "days": 1,
+    "days": 2,
     "imageUrl": "https://media.tacdn.com/media/attractions-splice-spp-674x446/0a/08/c2/e4.jpg",
     "eventLink": "#",
     "description": "Enjoy the festival of colors with music, dance and traditional Holi festivities."
@@ -24,10 +26,11 @@
   {
     "eventNumber": "3",
     "eventName": "Diwali Fair",
+    "status":"upcoming",
     "startDate": "2024-11-01",
-    "endDate": "2024-11-01",
+    "endDate": "2024-11-05",
     "venue": "Sector 17 Plaza, Chandigarh, India",
-    "days": 1,
+    "days": 5,
     "imageUrl": "https://people.com/thmb/-1Qzh0dM6aM1P03_JrZ1gmvPyG0=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc():focal(749x99:751x101)/diwali-102022-3-05a455826c2f4a2b993740300f88f041.jpg",
     "eventLink": "#",
     "description": "A grand fair celebrating Diwali with food stalls, crafts, and cultural performances."
@@ -35,6 +38,7 @@
   {
     "eventNumber": "4",
     "eventName": "Jaipur Literature Festival",
+    "status":"upcoming",  
     "startDate": "2025-01-15",
     "endDate": "2025-01-15",
     "venue": "Diggi Palace, Jaipur, India",

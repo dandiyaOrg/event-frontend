@@ -1,6 +1,9 @@
 import React from "react";
+import { Link } from "react-router-dom";
+import events from '../Data/Events.json';
 
 const EventCard = ({
+  
   eventNumber,
   eventName,
   startDate,
@@ -12,7 +15,8 @@ const EventCard = ({
   description,
 }) => {
   return (
-    <div className="flex rounded-2xl shadow-lg bg-gray-100 p-6 w-full max-w-6xl">
+    <Link to={`/events/${eventNumber}`} className="block hover:shadow-xl transition-shadow duration-200">
+   <div className="flex rounded-2xl shadow-lg bg-gray-100 p-6 w-full max-w-6xl">
       {/* Image Section */}
       <div className="w-1/4 flex items-center justify-center">
         <div className="w-full aspect-square rounded-xl bg-gray-300 flex items-center justify-center text-gray-500 text-2xl font-semibold overflow-hidden">
@@ -78,6 +82,7 @@ const EventCard = ({
         </div>
       </div>
     </div>
+    </Link>
   );
 };
 

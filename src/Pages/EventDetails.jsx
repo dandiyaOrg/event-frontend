@@ -1,44 +1,76 @@
-import React from 'react';
-import { useSelector } from 'react-redux';
-import { useParams } from 'react-router-dom';
-import events from '../Data/Events.json';  
+import { useParams } from "react-router-dom";
+import EventDetailCard from "../Components/EventDetailCard";
+import events from "../Data/Events.json";
+import SearchBar from "../Components/SearchBar";
+import SubEvent from "../Components/SubEvent";
 
 const EventDetails = () => {
-  const darkMode = useSelector((state) => state.theme.darkMode);
   const { eventId } = useParams();
-
-  // Find the event that matches the eventId in URL
-  const event = events.find(ev => ev.id === eventId);
+  const event = events.find((e) => String(e.eventNumber) === String(eventId));
 
   if (!event) {
     return (
-      <div className={`max-w-4xl mx-auto p-6 rounded shadow mt-10 text-center ${darkMode ? "bg-gray-800 text-red-400" : "bg-white text-red-600"}`}>
-        Event not found.
-      </div>
+      <div className="text-center py-10 text-gray-600">No event found!</div>
     );
   }
 
+  const handleAddSubEvent = () => {
+    // Logic to add a new event can be implemented here
+    console.log("Add new event");
+  };
+
   return (
-    <div className={`max-w-4xl mx-auto p-8 rounded shadow-sm shadow-amber-50 mt-8 ${darkMode ? "bg-gray-900 text-gray-300" : "bg-white text-gray-900"}`}>
-      <img 
-        src={event.image} 
-        alt={event.title} 
-        className="w-full h-64 object-cover rounded mb-6 shadow-lg"
-      />
-      <h1 className={`text-4xl font-extrabold mb-4 ${darkMode ? "text-blue-400" : "text-blue-900"}`}>
-        {event.title}
-      </h1>
-      <div className={`grid grid-cols-1 md:grid-cols-2 gap-6 text-lg mb-6 ${darkMode ? "text-gray-400" : "text-gray-700"}`}>
-        <div><strong>Date:</strong> {event.date}</div>
-        <div><strong>Time:</strong> {event.time}</div>
-        <div><strong>Venue:</strong> {event.venue}</div>
-        <div><strong>Location:</strong> {event.location}</div>
-        <div><strong>Price:</strong> {event.price}</div>
-        <div><strong>Organizer:</strong> {event.organizer}</div>
+    <div className=" bg-gray-50 flex flex-col items-center justify-center ">
+      <div className="max-w-6xl w-full bg-white shadow-xl rounded-2xl flex flex-row">
+        <div className="flex-1 p-8">
+          <div className="mb-4">
+            <span
+              className={
+                "px-4 py-2 rounded-xl text-white font-semibold text-sm " +
+                (event.status === "Active" ? "bg-green-500" : "bg-gray-400")
+              }
+            >
+              STATUS: {event.status.toUpperCase()}
+            </span>
+          </div>
+          <h1 className="text-3xl font-extrabold mb-6 tracking-wide">
+            {event.eventName}
+          </h1>
+          <div className="space-y-3 text-md text-gray-700 font-mono">
+            <div>
+              <span className="font-bold">Start date</span> - {event.startDate}
+            </div>
+            <div>
+              <span className="font-bold">End date</span> - {event.endDate}
+            </div>
+            <div>
+              <span className="font-bold">Venue</span> - {event.venue}
+            </div>
+            <div>
+              <span className="font-bold">Number of Days</span> - {event.days}{" "}
+              Days
+            </div>
+            <div>
+              <span className="font-bold">Type of Event</span> - {event.type}
+            </div>
+            <div>
+              <span className="font-bold">Description</span> -{" "}
+              {event.description}
+            </div>
+          </div>
+        </div>
+        <div className="flex-1 flex justify-center items-center min-h-[350px] p-6 bg-gray-100 rounded-r-2xl">
+          {/* You can embed a map here, or keep a placeholder */}
+          <div className="bg-white border-2 border-dashed border-gray-400 rounded-xl h-72 w-full flex items-center justify-center text-gray-500 text-lg font-bold">
+            MAP
+          </div>
+        </div>
       </div>
-      <p className={`${darkMode ? "text-gray-300" : "text-gray-800"} text-lg leading-relaxed`}>
-        {event.description}
-      </p>
+
+
+      {/* SUBEVENT */}
+ 
+     <SubEvent/>
     </div>
   );
 };

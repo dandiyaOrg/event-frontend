@@ -81,9 +81,9 @@ const CustomizableTable = ({
 
   const getStatusColor = (status) => {
     switch (status) {
-      case "success":
+      case "Success":
         return "bg-green-600";
-      case "pending":
+      case "Pending":
         return "bg-orange-300";
       default:
         return "bg-red-600";

@@ -1,7 +1,10 @@
 import React from "react";
 import InputField from "../Components/Input";
-import DatePicker from "../Components/DatePicker";
+import CustomDatePicker from "../Components/CustomDatePicker";
+import { TimePicker } from "../Components/TimePicker";
 import { useNavigate } from "react-router-dom";
+
+
 
 function App() {
 
@@ -9,15 +12,15 @@ function App() {
     const navigate=useNavigate();
   return (
     <div className=" p-6 bg-gray-100 rounded-lg shadow-md">
-      <h2 className="text-3xl font-semibold mb-6 text-gray-800">Create New Event</h2>
+      <h2 className="text-3xl font-semibold mb-6 text-gray-800">Create New Sub Event</h2>
       
       <form className="flex flex-col gap-6">
         
         {/* Event Name */}
         <InputField
-        label="Event Name"
+        label="Sub Event Name"
         id="event-name"
-        placeholder="Enter event name"
+        placeholder="Enter Sub event name"
         value={eventName}
         onChange={(e) => setEventName(e.target.value)}
           width="w-1/2"
@@ -25,20 +28,17 @@ function App() {
       />
         
         {/* Dates & Number of Days */}
-        <DatePicker />
+        <CustomDatePicker/>
 
-        {/* Type of Event */}
-        <InputField
-          label="Type of Event"
-          type="text"
-          id="event-type"
-          placeholder="Enter event type (e.g., Conference, Workshop)"
-          value=""
-          onChange={() => {}}
-          width="w-1/2"
-         className=""
-        />
 
+        {/* Time Picker  */}
+        <TimePicker/>
+
+
+
+
+
+     
         {/* Upload Image */}
         <div className="flex items-center gap-4">
           <label
@@ -67,18 +67,7 @@ function App() {
          className=""
         />
 
-        {/* Google Map Link */}
-        <InputField
-          label="Google Map Link"
-          type="url"
-          id="map-link"
-          placeholder="https://maps.google.com/..."
-          value=""
-          onChange={() => {}}
-          width="w-1/2"
-         className=""
-        />
-
+       
         {/* Description */}
         <InputField
           label="Description"
@@ -92,18 +81,7 @@ function App() {
          className=""
         />
 
-        {/* Extra Notes */}
-        <InputField
-          label="Extra Notes"
-          id="extra-notes"
-          placeholder="Any additional information"
-          value=""
-          onChange={() => {}}
-          isTextarea={true}
-          rows={5}
-          width=""
-         className=""
-        />
+       
 
         {/* Buttons */}
         <div className="flex justify-end gap-4 pt-4">

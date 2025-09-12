@@ -44,7 +44,6 @@ const transactionColumns = [
   { key: "dateTime", label: "Date Time" },
   { key: "status", label: "Status" },
   { key: "srcOfPayment", label: "Src of Payment" },
-  { key: "actions", label: "Actions" },
 ];
 
 
