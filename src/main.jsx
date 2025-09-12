@@ -24,6 +24,8 @@ import BillingUser from "./Pages/BillingUser";
 import Attendee from "./Pages/Attendee";
 import Orders from "./Pages/Orders";
 import EventDetailForm from "./Pages/EventDetailForm";
+import SubEventForm from "./Pages/SubEventForm";
+import SubEventDetails from "./Pages/SubEventDetail";
 
 
 
@@ -55,8 +57,11 @@ const router = createBrowserRouter(
       >
         <Route index element={<Dashboard />} />
         <Route path="events" element={<Events />} />
-        <Route path="events/new" element={<EventDetailForm />} />
-        <Route path="events/:eventId" element={<EventDetails />} />
+        <Route path="/events/new" element={<EventDetailForm />} />
+        <Route path="/events/:eventId" element={<EventDetails />} />
+        <Route path="/subEvents/new" element={<SubEventForm />} />
+        <Route path="/events/:eventId/:subEventId" element={<SubEventDetails />} />
+
         <Route path="employees" element={<Employees />} />
         <Route path="transactions" element={<Transactions />} />
         <Route path="billingUsers" element={<BillingUser />} />

@@ -5,7 +5,7 @@ const orderData = [
   {
     id: 1,
     orderNumber: "ORD20251001",
-    status: "Delivered",
+    status: "Success",
     trxnNumber: "TXN2025001",
     billingUser: "Amit Verma",
   },
@@ -26,7 +26,7 @@ const orderData = [
   {
     id: 4,
     orderNumber: "ORD20251004",
-    status: "Processing",
+    status: "Pending",
     trxnNumber: "TXN2025005",
     billingUser: "Anjali Jain",
   },
@@ -38,7 +38,7 @@ const orderColumns = [
   { key: "status", label: "Status" },
   { key: "trxnNumber", label: "Trxn Number" },
   { key: "billingUser", label: "Billing User" },
-  { key: "action", label: "Action" }, // Your table's edit/delete/view buttons go here
+  
 ];
 
 

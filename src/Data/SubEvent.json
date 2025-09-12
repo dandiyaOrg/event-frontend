@@ -1,0 +1,34 @@
+[
+  {
+    "subEventId": "101",
+    "eventNumber": "1",
+    "subEventName": "Opening Ceremony",
+    "date": "2024-10-05",
+    "description": "Opening Dandiya Night with traditional Garba and Dandiya Raas dance performances.",
+    "image": "https://wanderon-images.gumlet.io/blogs/new/2025/01/21/dandiya-nights.jpg"
+  },
+  {
+    "subEventId": "102",
+    "eventNumber": "1",
+    "subEventName": "Music Night",
+    "date": "2024-10-08",
+    "description": "Special music night with live DJ and folk singers celebrating Navratri.",
+    "image": "https://wanderon-images.gumlet.io/blogs/new/2025/01/21/dandiya-nights.jpg"
+  },
+  {
+    "subEventId": "201",
+    "eventNumber": "2",
+    "subEventName": "Color Splash Opening",
+    "date": "2025-03-10",
+    "description": "Holi Color Splash opening ceremony with live music and cultural programs.",
+    "image": "https://media.tacdn.com/media/attractions-splice-spp-674x446/0a/08/c2/e4.jpg"
+  },
+  {
+    "subEventId": "202",
+    "eventNumber": "2",
+    "subEventName": "Traditional Holi",
+    "date": "2025-03-11",
+    "description": "Traditional Holi with water balloons, gulal colors, and feast at Lalbagh Grounds.",
+    "image": "https://media.tacdn.com/media/attractions-splice-spp-674x446/0a/08/c2/e4.jpg"
+  }
+]

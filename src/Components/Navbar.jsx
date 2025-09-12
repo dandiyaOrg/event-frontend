@@ -7,7 +7,7 @@ import { AiOutlineClose } from "react-icons/ai";
 import { Link } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { login } from "../features/AuthSlice";
-import ProfilePopup from "../Components/LoginPopUp";
+
 import { toggleDarkMode } from '../features/ThemeSlice';
 import { toggleCollapse } from '../features/CollapsedSlice'; 
 
