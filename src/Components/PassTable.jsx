@@ -42,6 +42,10 @@ const PassTable = () => {
   const [passesData, setPassesData] = useState(initialPassesData);
   const [selectedPass, setSelectedPass] = useState(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editingPass, setEditingPass] = useState(null);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [passToDelete, setPassToDelete] = useState(null);
 
   // Handler to open detail popup
   const handleRowClick = (rowData) => {
@@ -66,8 +70,56 @@ const PassTable = () => {
 
   // Handler to add new pass
   const handleAddNewPass = (newPass) => {
-    setPassesData(prevPasses => [...prevPasses, newPass]);
-    console.log("New pass created:", newPass);
+    const passWithId = {
+      ...newPass,
+      id: Math.max(...passesData.map(p => p.id), 0) + 1
+    };
+    setPassesData(prevPasses => [...prevPasses, passWithId]);
+    console.log("New pass created:", passWithId);
+  };
+
+  // Handler for edit button
+  const handleEdit = (pass) => {
+    setEditingPass(pass);
+    setShowEditModal(true);
+  };
+
+  // Handler to close edit modal
+  const closeEditModal = () => {
+    setShowEditModal(false);
+    setEditingPass(null);
+  };
+
+  // Handler to update pass
+  const handleUpdatePass = (updatedPass) => {
+    setPassesData(prevPasses => 
+      prevPasses.map(pass => 
+        pass.id === updatedPass.id ? updatedPass : pass
+      )
+    );
+    console.log("Pass updated:", updatedPass);
+  };
+
+  // Handler for delete button
+  const handleDelete = (pass) => {
+    setPassToDelete(pass);
+    setShowDeleteConfirm(true);
+  };
+
+  // Handler to confirm delete
+  const confirmDelete = () => {
+    setPassesData(prevPasses => 
+      prevPasses.filter(pass => pass.id !== passToDelete.id)
+    );
+    setShowDeleteConfirm(false);
+    setPassToDelete(null);
+    console.log("Pass deleted:", passToDelete);
+  };
+
+  // Handler to cancel delete
+  const cancelDelete = () => {
+    setShowDeleteConfirm(false);
+    setPassToDelete(null);
   };
 
   return (
@@ -77,6 +129,8 @@ const PassTable = () => {
         allColumns={passesColumns}
         rowsPerPageOptions={[5, 10, 25]}
         onRowClick={handleRowClick}
+        onEdit={handleEdit}
+        onDelete={handleDelete}
       />
 
       {/* Add New Pass Button */}
@@ -91,7 +145,7 @@ const PassTable = () => {
 
       {/* Pass Detail Popup */}
       {selectedPass && (
-        <div className="fixed inset-0 backdrop-blur-sm  bg-opacity-40 flex items-center justify-center z-50">
+        <div className="fixed inset-0 backdrop-blur-sm bg-black bg-opacity-40 flex items-center justify-center z-50">
           <div className="bg-white rounded-xl p-6 max-w-md w-full shadow-lg relative max-h-[80vh] overflow-y-auto">
             <button
               onClick={closeDetailModal}
@@ -126,8 +180,43 @@ const PassTable = () => {
         onClose={closeCreateModal}
         onSubmit={handleAddNewPass}
       />
+
+      {/* Edit Pass Modal */}
+      <CreateNewPass
+        isOpen={showEditModal}
+        onClose={closeEditModal}
+        onSubmit={handleUpdatePass}
+        editMode={true}
+        initialData={editingPass}
+      />
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteConfirm && (
+        <div className="fixed inset-0 backdrop-blur-sm bg-opacity-40 flex items-center justify-center z-50">
+          <div className="bg-white rounded-xl p-6 max-w-sm w-full shadow-lg relative">
+            <h2 className="text-xl font-semibold mb-4">Confirm Delete</h2>
+            <p className="text-gray-600 mb-6">
+              Are you sure you want to delete "{passToDelete?.name}"? This action cannot be undone.
+            </p>
+            <div className="flex justify-end space-x-3">
+              <button
+                onClick={cancelDelete}
+                className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmDelete}
+                className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
 
-export default PassTable; 
+export default PassTable;

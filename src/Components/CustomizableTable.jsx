@@ -15,7 +15,9 @@ const CustomizableTable = ({
   initialColumns,
   allColumns = [],
   rowsPerPageOptions = [10, 25, 50, 100],
-  onRowClick
+  onRowClick,
+  onEdit,  // Add this
+  onDelete // Add this
 }) => {
   const [selectedRows, setSelectedRows] = useState(new Set());
   const [visibleColumns, setVisibleColumns] = useState(

@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import SearchBar from "../Components/SearchBar";
 import CustomizableTable from "../Components/CustomizableTable";
 import CreateNewEmployee from "../Components/CreateNewEmployee";
+import EmployeeCard from "../Components/EmployeeCard"; // Import your separate card component
 
 const initialEmployeeData = [
   {
@@ -49,26 +50,21 @@ const employeeColumns = [
 const EmployeePage = () => {
   const [employeeData, setEmployeeData] = useState(initialEmployeeData);
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [showEmployeeCard, setShowEmployeeCard] = useState(false); // New state for card
   const [editingEmployee, setEditingEmployee] = useState(null);
-
-  // Debug logs to see what's happening
-  console.log("EmployeePage render:", { showCreateModal, editingEmployee });
+  const [selectedEmployee, setSelectedEmployee] = useState(null); // New state for selected employee
 
   const handleAddEmployee = () => {
-    console.log("Add employee button clicked - setting modal to true");
-    setEditingEmployee(null); // Clear any editing state
+    setEditingEmployee(null);
     setShowCreateModal(true);
   };
 
   const handleCloseModal = () => {
-    console.log("Closing modal");
     setShowCreateModal(false);
     setEditingEmployee(null);
   };
 
   const handleSubmitEmployee = (employeeInfo) => {
-    console.log("Submit employee:", employeeInfo);
-    
     if (editingEmployee) {
       // Update existing employee
       setEmployeeData(prevData =>
@@ -76,26 +72,33 @@ const EmployeePage = () => {
           emp.id === editingEmployee.id ? { ...employeeInfo, id: editingEmployee.id } : emp
         )
       );
-      console.log("Employee updated");
     } else {
       // Add new employee
       setEmployeeData(prevData => [...prevData, employeeInfo]);
-      console.log("New employee added");
     }
   };
 
   const handleEditEmployee = (employee) => {
-    console.log("Edit employee clicked:", employee);
     setEditingEmployee(employee);
     setShowCreateModal(true);
   };
 
   const handleDeleteEmployee = (employee) => {
-    console.log("Delete employee clicked:", employee);
     if (window.confirm(`Are you sure you want to delete ${employee.name}?`)) {
       setEmployeeData(prevData => prevData.filter(emp => emp.id !== employee.id));
-      console.log("Employee deleted");
     }
+  };
+
+  // New function to handle row click and show employee card
+  const handleRowClick = (employee) => {
+    setSelectedEmployee(employee);
+    setShowEmployeeCard(true);
+  };
+
+  // New function to close employee card
+  const handleCloseEmployeeCard = () => {
+    setShowEmployeeCard(false);
+    setSelectedEmployee(null);
   };
 
   return (
@@ -105,9 +108,6 @@ const EmployeePage = () => {
         <h1 className="text-4xl font-extrabold text-gray-800 tracking-tight">
           Employees
         </h1>
-        <p className="text-gray-600 mt-2">
-          Manage your team members - Modal State: {showCreateModal ? 'OPEN' : 'CLOSED'}
-        </p>
       </div>
 
       {/* Controls */}
@@ -124,8 +124,6 @@ const EmployeePage = () => {
         </button>
       </div>
 
-      
-
       {/* Table */}
       <div className="bg-white rounded-xl shadow-sm">
         <CustomizableTable
@@ -134,11 +132,11 @@ const EmployeePage = () => {
           rowsPerPageOptions={[5, 10, 25]}
           onEdit={handleEditEmployee}
           onDelete={handleDeleteEmployee}
+          onRowClick={handleRowClick}
         />
       </div>
 
       {/* Create/Edit Employee Modal */}
-      {console.log("Rendering CreateNewEmployee with props:", { isOpen: showCreateModal, editingEmployee })}
       <CreateNewEmployee
         isOpen={showCreateModal}
         onClose={handleCloseModal}
@@ -146,7 +144,12 @@ const EmployeePage = () => {
         editingEmployee={editingEmployee}
       />
 
-     
+      {/* Employee Details Card - Using your separate component */}
+      <EmployeeCard
+        isOpen={showEmployeeCard}
+        onClose={handleCloseEmployeeCard}
+        employee={selectedEmployee}
+      />
     </div>
   );
 };

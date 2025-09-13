@@ -7,7 +7,7 @@ const CreateNewEmployee = ({ isOpen, onClose, onSubmit, editingEmployee = null }
     username: "",
     mobileNumber: "",
     emailId: "",
-    password: "",
+    password: "",   
   });
 
   const [errors, setErrors] = useState({});
