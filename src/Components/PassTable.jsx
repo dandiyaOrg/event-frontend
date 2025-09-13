@@ -145,7 +145,7 @@ const PassTable = () => {
 
       {/* Pass Detail Popup */}
       {selectedPass && (
-        <div className="fixed inset-0 backdrop-blur-sm bg-black bg-opacity-40 flex items-center justify-center z-50">
+        <div className="fixed inset-0 backdrop-blur-sm  bg-opacity-40 flex items-center justify-center z-50">
           <div className="bg-white rounded-xl p-6 max-w-md w-full shadow-lg relative max-h-[80vh] overflow-y-auto">
             <button
               onClick={closeDetailModal}
