@@ -15,6 +15,9 @@ const CustomizableTable = ({
   initialColumns,
   allColumns = [],
   rowsPerPageOptions = [10, 25, 50, 100],
+  onRowClick,
+  onEdit,  // Add this
+  onDelete // Add this
 }) => {
   const [selectedRows, setSelectedRows] = useState(new Set());
   const [visibleColumns, setVisibleColumns] = useState(
@@ -24,7 +27,8 @@ const CustomizableTable = ({
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(rowsPerPageOptions[0]);
 
-  const useData = data && data.length ? data : sampleData;
+  // Use provided data or fallback to empty array if no data
+  const useData = data && data.length ? data : [];
 
   const totalPages = Math.ceil(useData.length / rowsPerPage);
   const startIndex = (currentPage - 1) * rowsPerPage;
@@ -90,14 +94,31 @@ const CustomizableTable = ({
     }
   };
 
-  const handleEdit = (row) => {
-    // Your edit logic here (e.g., open modal, navigate to edit page)
-    alert(`Edit row id: ${row.id}`);
+  const handleEdit = (row, e) => {
+    e.stopPropagation();
+    if (onEdit) {
+      onEdit(row);
+    } else {
+      // Fallback alert if no onEdit prop provided
+      alert(`Edit row id: ${row.id}`);
+    }
   };
 
-  const handleDelete = (row) => {
-    // Your delete logic here (e.g., show confirmation, remove from state)
-    alert(`Delete row id: ${row.id}`);
+  const handleDelete = (row, e) => {
+    e.stopPropagation();
+    if (onDelete) {
+      onDelete(row);
+    } else {
+      // Fallback alert if no onDelete prop provided
+      alert(`Delete row id: ${row.id}`);
+    }
+  };
+
+  const handleRowClick = (row) => {
+    console.log("Table row clicked:", row);
+    if (onRowClick) {
+      onRowClick(row);
+    }
   };
 
   const renderCellContent = (column, value, row) => {
@@ -113,7 +134,11 @@ const CustomizableTable = ({
         );
       case "reviewer":
         return value === "Assign reviewer" ? (
-          <select className="bg-transparent border border-gray-600 rounded px-2 py-1 text-gray-400 text-sm focus:outline-none focus:ring-1 focus:ring-gray-500">
+          <select 
+            className="bg-transparent border border-gray-600 rounded px-2 py-1 text-gray-400 text-sm focus:outline-none focus:ring-1 focus:ring-gray-500"
+            onClick={(e) => e.stopPropagation()}
+            onChange={(e) => e.stopPropagation()}
+          >
             <option>Assign reviewer</option>
             <option>Eddie Lake</option>
             <option>Jamik Tashpulatov</option>
@@ -180,8 +205,8 @@ const CustomizableTable = ({
           <thead className="bg-gray-800 border-b border-gray-700">
             <tr>
               <th className="w-12 px-4 py-3 text-left font-medium text-gray-300">
-  S.No.
-</th>
+                S.No.
+              </th>
 
               {allColumns
                 .filter((col) => visibleColumns.has(col.key))
@@ -199,14 +224,15 @@ const CustomizableTable = ({
             </tr>
           </thead>
           <tbody>
-            {paginatedData.map((row,index) => (
+            {paginatedData.map((row, index) => (
               <tr
                 key={row.id}
-                className="border-b border-gray-800 hover:bg-gray-800/50"
+                className="border-b border-gray-800 hover:bg-gray-800/50 cursor-pointer"
+                onClick={() => handleRowClick(row)}
               >
                 <td className="px-4 py-3 text-sm text-gray-900">
-        {startIndex + index + 1}
-      </td>
+                  {startIndex + index + 1}
+                </td>
                 {allColumns
                   .filter((col) => visibleColumns.has(col.key))
                   .map((column) => (
@@ -218,21 +244,23 @@ const CustomizableTable = ({
                     </td>
                   ))}
 
-                <td className="px-4 py-3 flex items-center gap-2">
-                  <button
-                    onClick={() => handleEdit(row)}
-                    className="p-1 rounded hover:bg-gray-700 text-gray-500"
-                    title="Edit"
-                  >
-                    <Edit className="w-5 h-5" />
-                  </button>
-                  <button
-                    onClick={() => handleDelete(row)}
-                    className="p-1 rounded hover:bg-gray-700 text-gray-900"
-                    title="Delete"
-                  >
-                    <Trash2 className="w-5 h-5" />
-                  </button>
+                <td className="px-4 py-3">
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={(e) => handleEdit(row, e)}
+                      className="p-1 rounded hover:bg-gray-700 text-gray-500"
+                      title="Edit"
+                    >
+                      <Edit className="w-5 h-5" />
+                    </button>
+                    <button
+                      onClick={(e) => handleDelete(row, e)}
+                      className="p-1 rounded hover:bg-gray-700 text-gray-900"
+                      title="Delete"
+                    >
+                      <Trash2 className="w-5 h-5" />
+                    </button>
+                  </div>
                 </td>
               </tr>
             ))}
@@ -300,4 +328,4 @@ const CustomizableTable = ({
   );
 };
 
-export default CustomizableTable;
+export default CustomizableTable; 

@@ -2,33 +2,57 @@
   {
     "subEventId": "101",
     "eventNumber": "1",
+    "eventName": "Navratri Festival",
     "subEventName": "Opening Ceremony",
     "date": "2024-10-05",
+    "startTime": "19:00",
+    "endTime": "21:00",
+    "venue": "Ashoka Garden",
     "description": "Opening Dandiya Night with traditional Garba and Dandiya Raas dance performances.",
-    "image": "https://wanderon-images.gumlet.io/blogs/new/2025/01/21/dandiya-nights.jpg"
+    "images": [
+      "https://wanderon-images.gumlet.io/blogs/new/2025/01/21/dandiya-nights.jpg"
+    ]
   },
   {
     "subEventId": "102",
     "eventNumber": "1",
+    "eventName": "Navratri Festival",
     "subEventName": "Music Night",
     "date": "2024-10-08",
+    "startTime": "19:00",
+    "endTime": "21:00",
+    "venue": "Ashoka Garden",
     "description": "Special music night with live DJ and folk singers celebrating Navratri.",
-    "image": "https://wanderon-images.gumlet.io/blogs/new/2025/01/21/dandiya-nights.jpg"
+    "images": [
+      "https://wanderon-images.gumlet.io/blogs/new/2025/01/21/dandiya-nights.jpg"
+    ]
   },
   {
     "subEventId": "201",
     "eventNumber": "2",
+    "eventName": "Holi Festival",
     "subEventName": "Color Splash Opening",
     "date": "2025-03-10",
+    "startTime": "19:00",
+    "endTime": "21:00",
+    "venue": "Ashoka Garden",
     "description": "Holi Color Splash opening ceremony with live music and cultural programs.",
-    "image": "https://media.tacdn.com/media/attractions-splice-spp-674x446/0a/08/c2/e4.jpg"
+    "images": [
+      "https://media.tacdn.com/media/attractions-splice-spp-674x446/0a/08/c2/e4.jpg"
+    ]
   },
   {
     "subEventId": "202",
     "eventNumber": "2",
+    "eventName": "Holi Festival",
     "subEventName": "Traditional Holi",
     "date": "2025-03-11",
+    "startTime": "19:00",
+    "endTime": "21:00",
+    "venue": "Ashoka Garden",
     "description": "Traditional Holi with water balloons, gulal colors, and feast at Lalbagh Grounds.",
-    "image": "https://media.tacdn.com/media/attractions-splice-spp-674x446/0a/08/c2/e4.jpg"
+    "images": [
+      "https://media.tacdn.com/media/attractions-splice-spp-674x446/0a/08/c2/e4.jpg"
+    ]
   }
 ]

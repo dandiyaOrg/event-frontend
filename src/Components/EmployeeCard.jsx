@@ -1,69 +1,98 @@
-  import React from "react";
-  import { useSelector } from "react-redux";
-  import { MdOutlineMail, MdPhone, MdPerson, MdBadge } from "react-icons/md";
+import React, { useState } from "react";
+import { X, User, Mail, Phone, Lock } from "lucide-react";
 
-  const EmployeeCard = ({ image, name, role, email, mobile, description, onEdit, onDelete }) => {
-    const darkMode = useSelector((state) => state.theme.darkMode);
+const EmployeeCard = ({ isOpen, onClose, employee }) => {
+  if (!isOpen || !employee) return null;
 
-    return (
-      <div
-        className={`rounded-lg shadow p-4 border mx-auto w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-sm xl:max-w-md
-          ${darkMode ? "bg-gray-800 border-gray-700 text-gray-200" : "bg-white border-gray-200 text-gray-700"}
-        `}
-      >
-        <img
-          src={image}
-          alt={name}
-          className="w-full h-56 sm:h-64 md:h-72 object-cover rounded-md mb-4"
-        />
-        <div className="space-y-3">
-          <div className={`flex items-center gap-2 font-semibold text-lg ${darkMode ? "text-gray-100" : "text-gray-900"}`}>
-            <MdPerson className="text-xl" />
-            <span>{name}</span>
-          </div>
-          <div className={`flex items-center gap-2 ${darkMode ? "text-gray-400" : "text-gray-600"}`}>
-            <MdBadge className="text-lg" />
-            <span>{role}</span>
-          </div>
-          <div className={`flex items-center gap-2 ${darkMode ? "text-gray-400" : "text-gray-600"}`}>
-            <MdOutlineMail className="text-lg" />
-            <a
-              href={`mailto:${email}`}
-              className="hover:underline text-blue-600 break-words"
-            >
-              {email}
-            </a>
-          </div>
-          <div className={`flex items-center gap-2 ${darkMode ? "text-gray-400" : "text-gray-600"}`}>
-            <MdPhone className="text-lg" />
-            <a href={`tel:${mobile}`} className="hover:underline text-blue-600">
-              {mobile}
-            </a>
-          </div>
-          <p className={`${darkMode ? "text-gray-300" : "text-gray-700"} text-sm leading-relaxed`}>
-            {description}
-          </p>
-        </div>
-
-        {/* Buttons container */}
-        <div className="flex justify-between gap-4 mt-4">
-          <button
-            onClick={onEdit}
-            className="px-4 py-2 rounded bg-gray-600 text-white hover:bg-gray-700 transition"
-            aria-label="Edit employee"
-          >
-            Edit
-          </button>
-          <button
-            onClick={onDelete}
-            className="px-4 py-2 rounded bg-gray-600 text-white hover:bg-gray-700 transition"
-            aria-label="Delete employee"
-          >
-            Delete
-          </button>
-        </div>
-      </div>
-    );
+  // Function to get initials from name
+  const getInitials = (name) => {
+    return name
+      .split(' ')
+      .map(word => word.charAt(0).toUpperCase())
+      .join('')
+      .slice(0, 2);
   };
 
-  export default EmployeeCard;
+  // Function to mask password
+  const getMaskedPassword = (password) => {
+    return '*'.repeat(password?.length || 8);
+  };
+
+  return (
+    <div className="fixed inset-0 bg-gradient-to-br from-gray-900/60 via-gray-800/40 to-gray-900/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+      <div className="bg-white/95 backdrop-blur-md rounded-3xl shadow-2xl w-full max-w-sm mx-auto border border-white/20 transform transition-all">
+        {/* Header */}
+        <div className="relative bg-gradient-to-r from-gray-600/90 to-gray-700/90 backdrop-blur-md px-6 py-6 text-white rounded-t-3xl">
+          <button
+            onClick={onClose}
+            className="absolute top-4 right-4 p-1.5 hover:bg-white/20 rounded-full transition-all duration-200"
+          >
+            <X className="w-4 h-4" />
+          </button>
+          
+          {/* Profile Section */}
+          <div className="flex flex-col items-center">
+            {/* Avatar */}
+            <div className="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center text-xl font-bold mb-3 border-2 border-white/30 shadow-lg">
+              {getInitials(employee.name)}
+            </div>
+            
+            {/* Name */}
+            <h2 className="text-xl font-bold text-center">{employee.name}</h2>
+            <p className="text-gray-200 text-sm">@{employee.username}</p>
+          </div>
+        </div>
+
+        {/* Content Section */}
+        <div className="p-6 space-y-4">
+          {/* Username */}
+          <div className="flex items-center gap-3 p-3 bg-gray-50/80 backdrop-blur-sm rounded-xl hover:bg-gray-100/80 transition-all duration-200">
+            <div className="p-2 bg-gray-200/60 rounded-lg">
+              <User className="w-4 h-4 text-gray-600" />
+            </div>
+            <div className="flex-1">
+              <p className="text-xs text-gray-500 uppercase tracking-wide font-medium">Username</p>
+              <p className="text-sm font-semibold text-gray-800">{employee.username}</p>
+            </div>
+          </div>
+
+          {/* Mobile Number */}
+          <div className="flex items-center gap-3 p-3 bg-gray-50/80 backdrop-blur-sm rounded-xl hover:bg-gray-100/80 transition-all duration-200">
+            <div className="p-2 bg-gray-200/60 rounded-lg">
+              <Phone className="w-4 h-4 text-gray-600" />
+            </div>
+            <div className="flex-1">
+              <p className="text-xs text-gray-500 uppercase tracking-wide font-medium">Mobile Number</p>
+              <p className="text-sm font-semibold text-gray-800">{employee.mobileNumber}</p>
+            </div>
+          </div>
+
+          {/* Email */}
+          <div className="flex items-center gap-3 p-3 bg-gray-50/80 backdrop-blur-sm rounded-xl hover:bg-gray-100/80 transition-all duration-200">
+            <div className="p-2 bg-gray-200/60 rounded-lg">
+              <Mail className="w-4 h-4 text-gray-600" />
+            </div>
+            <div className="flex-1">
+              <p className="text-xs text-gray-500 uppercase tracking-wide font-medium">Email Address</p>
+              <p className="text-sm font-semibold text-gray-800">{employee.emailId}</p>
+            </div>
+          </div>
+
+          {/* Password */}
+          <div className="flex items-center gap-3 p-3 bg-gray-50/80 backdrop-blur-sm rounded-xl hover:bg-gray-100/80 transition-all duration-200">
+            <div className="p-2 bg-gray-200/60 rounded-lg">
+              <Lock className="w-4 h-4 text-gray-600" />
+            </div>
+            <div className="flex-1">
+              <p className="text-xs text-gray-500 uppercase tracking-wide font-medium">Password</p>
+              <p className="text-sm font-semibold text-gray-800">{getMaskedPassword(employee.password)}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+
+export default EmployeeCard;

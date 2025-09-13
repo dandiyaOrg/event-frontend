@@ -3,12 +3,15 @@ import { Link } from "react-router-dom";
 
 const SubEventCard = ({
   subEventId,
-  subEventName,
   eventNumber,
+  eventName,
+  subEventName,
   date,
-  image,
+  images = [],
   description,
 }) => {
+  const image = images.length > 0 ? images[0] : null;
+
   return (
     <Link to={`/events/${eventNumber}/${subEventId}`} className="block hover:shadow-xl transition-shadow duration-200">
       <div className="flex rounded-2xl shadow-lg bg-gray-100 p-6 w-full max-w-6xl">
@@ -30,12 +33,17 @@ const SubEventCard = ({
         <div className="w-3/4 pl-8 flex flex-col justify-between">
           {/* Top Info */}
           <div>
+            {eventName && (
+              <div className="text-sm text-gray-500 font-mono tracking-wider mb-1">
+                Event - {eventName}
+              </div>
+            )}
             <div className="text-xs text-gray-500 font-mono tracking-wider mb-1">
               SUB EVENT ID - {subEventId}
             </div>
             <div className="text-2xl font-semibold text-gray-800 mb-3">
-            {subEventName}
-          </div>
+              {subEventName}
+            </div>
             <div className="text-lg font-semibold text-gray-800 mb-3">
               Date: <span className="font-normal">{date}</span>
             </div>
