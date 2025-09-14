@@ -1,9 +1,11 @@
 import React, { useState } from "react";
-import { useDispatch } from "react-redux";
-import { login } from "../features/AuthSlice"; // Adjust path if needed
+import { useLoginMutation } from '../features/auth/authApi';
 import { useNavigate, Link } from "react-router-dom";
-import SignUp from "./SignUp";
-import { loginUser } from "../../api";
+
+// import SignUp from "./SignUp";
+// import { loginUser } from "../../api";
+// import { useDispatch } from "react-redux"; 
+// import { login } from "../features/AuthSlice"; 
 
 // You can import your desired image here or use a URL
 const IMAGE_URL =
@@ -14,20 +16,19 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
-  const dispatch = useDispatch();
+
+  // const dispatch = useDispatch();
+  const [login, {isLoading, error}] = useLoginMutation();
+
   const navigate = useNavigate();
 
  const handleLogin = async (e) => {
     e.preventDefault();
 
     try {
-      const user = await loginUser(email, password);
-      if (user) {
-        dispatch(login(user));
-        navigate("/");
-      } else {
-        alert("Invalid credentials");
-      }
+      // const user = await loginUser(email, password);
+      await login({ email, password }).unwrap();
+      navigate("/otp");
     } catch (err) {
       console.error("Login error", err);
       alert("Login failed");
@@ -117,6 +118,7 @@ const Login = () => {
                   type="button"
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500"
                   onClick={() => setShowPassword((s) => !s)}
+                  disabled={isLoading}
                   tabIndex={-1}
                 >
                   {showPassword ? (
@@ -156,6 +158,7 @@ const Login = () => {
             >
               Login
             </button>
+            {error && <div style={{ color: 'red' }}>Login failed</div>}
           </form>
           <div className="text-center mt-8 text-sm text-gray-500">
             Don't have an account?{" "}

@@ -6,7 +6,7 @@ import { AiOutlineClose } from "react-icons/ai";
 
 import { Link } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
-import { login } from "../features/AuthSlice";
+
 
 import { toggleDarkMode } from '../features/ThemeSlice';
 import { toggleCollapse } from '../features/CollapsedSlice'; 
@@ -14,19 +14,12 @@ import { toggleCollapse } from '../features/CollapsedSlice';
 
 
 const Navbar = ({ isClicked, setIsClicked }) => {
-  const isLogin = useSelector((state) => state.auth.isLogin);
-const user = useSelector((state) => state.auth.user);  // select logged-in user
 
   const isCollapsed = useSelector((state) => state.collapsed.isCollapsed);
 
   const dispatch = useDispatch();
   const darkMode = useSelector(state => state.theme.darkMode);
   const [showLogin, setShowLogin] = useState(false);
-
-  const handleLogin = () => {
-    dispatch(login(userObject));
-
-  };
 
   // Conditional classes for light/dark mode
   const navClasses = `w-full shadow flex items-center justify-between px-6 py-1  ${
@@ -81,10 +74,10 @@ const user = useSelector((state) => state.auth.user);  // select logged-in user
          
             <Link to="/profile" className="flex items-center gap-2 cursor-pointer">
     <span className={`${darkMode ? "text-gray-200" : "text-gray-800"} font-medium`}>
-      {user.firstName || user.name || "User"}
+      {"User"}
     </span>
     <img
-      src={user.avatar || "https://randomuser.me/api/portraits/men/1.jpg"} // fallback avatar
+      src={"https://randomuser.me/api/portraits/men/1.jpg"} // fallback avatar
       alt="User"
       className="w-8 h-8 rounded-full object-cover"
     />

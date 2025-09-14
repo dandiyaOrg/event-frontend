@@ -1,19 +1,10 @@
 import { MdPerson, MdEdit, MdLogout } from "react-icons/md";
 import { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { logout } from "../features/AuthSlice"; // Adjust path as needed
 
 const ProfileSidebar = () => {
   const [active, setActive] = useState("profile");
-  const isLogin = useSelector((state) => state.auth.isLogin);
   const darkMode = useSelector((state) => state.theme.darkMode);
-  const dispatch = useDispatch();
-
-  const handleLogout = () => {
-    dispatch(logout());
-    setActive("logout"); // optionally set active tab to logout or reset it
-    // add additional logout flow if required
-  };
 
   if (!isLogin) {
     return (

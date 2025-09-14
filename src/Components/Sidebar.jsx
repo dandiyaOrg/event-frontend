@@ -6,11 +6,7 @@ import { FaBars } from "react-icons/fa";
 import { AiOutlineClose } from "react-icons/ai";
 import { RiBillLine } from "react-icons/ri";
 import { MdPeopleAlt ,MdOutlineShoppingCart } from "react-icons/md";
-
-import {
-  MdOutlineDashboard,
-  MdOutlineEmojiEvents,
-} from "react-icons/md";
+import { MdOutlineDashboard, MdOutlineEmojiEvents } from "react-icons/md";
 import { GrUserWorker, GrTransaction } from "react-icons/gr";
 import { useSelector } from "react-redux";
 
