@@ -2,7 +2,7 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import "./index.css";
 import { Provider ,useSelector} from 'react-redux';
-import { store } from './features/Store';
+import { store } from './app/store.js';
 import Login from "./Pages/LogIn"; // your login component
 import {
   createBrowserRouter,
@@ -26,15 +26,14 @@ import Orders from "./Pages/Orders";
 import EventDetailForm from "./Pages/EventDetailForm";
 import SubEventForm from "./Pages/SubEventForm";
 import SubEventDetails from "./Pages/SubEventDetail";
+import OtpPage from "./Pages/OtpPage.jsx";
 
 
 
 function ProtectedRoute({ children }) {
-  const isLogin = useSelector(state => state.auth.isLogin);
-  if (!isLogin) {
-    // Redirect to login if not authenticated
-    return <Navigate to="/login" replace />;
-    
+  const accessToken = useSelector(state => state.auth.accessToken);
+  if (!accessToken) {
+    return <Navigate to="/login" replace />; 
   }
   return children;
 }
@@ -45,6 +44,7 @@ const router = createBrowserRouter(
       {/* Public login path */}
       <Route path="/login" element={<Login />} />
       <Route path="/SignUp" element={<SignUp />} />
+      <Route path="/otp" element={<OtpPage />} />
 
       {/* Protected area */}
       <Route
