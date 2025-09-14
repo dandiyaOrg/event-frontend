@@ -1,20 +1,26 @@
 import React, { useState } from "react";
+
 import { useLoginMutation } from '../features/auth/authApi';
+
 import { useNavigate, Link } from "react-router-dom";
+import SignUp from "./SignUp";
 
-// import SignUp from "./SignUp";
-// import { loginUser } from "../../api";
-// import { useDispatch } from "react-redux"; 
-// import { login } from "../features/AuthSlice"; 
+import { MdKey } from "react-icons/md";
+import { IoEyeOffOutline } from "react-icons/io5";
+import { IoEyeOutline } from "react-icons/io5";
+import OTPModal from "../Components/OtpModal"; // Import the OTP Modal component
 
-// You can import your desired image here or use a URL
+
 const IMAGE_URL =
-  "https://png.pngtree.com/thumb_back/fh260/background/20240103/pngtree-luminous-vector-background-with-abstract-white-texture-for-creative-designs-image_13880263.png"; // Example Unsplash image
+  "https://png.pngtree.com/thumb_back/fh260/background/20240103/pngtree-luminous-vector-background-with-abstract-white-texture-for-creative-designs-image_13880263.png";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [showOtpModal, setShowOtpModal] = useState(false);
+  const [isOtpLoading, setIsOtpLoading] = useState(false);
+  const [userTempData, setUserTempData] = useState(null);
 
 
   // const dispatch = useDispatch();
@@ -22,19 +28,29 @@ const Login = () => {
 
   const navigate = useNavigate();
 
- const handleLogin = async (e) => {
+   const isDevelopmentMode = process.env.NODE_ENV === 'development';
+
+  const handleLogin = async (e) => {
     e.preventDefault();
 
     try {
+
       // const user = await loginUser(email, password);
       await login({ email, password }).unwrap();
       navigate("/otp");
+
+      
+       
+      
+
     } catch (err) {
       console.error("Login error", err);
       alert("Login failed");
     }
   };
 
+  
+  
 
   return (
     <div className="min-h-screen w-full flex flex-col md:flex-row">
@@ -95,15 +111,7 @@ const Login = () => {
               </label>
               <div className="relative">
                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
-                  <svg
-                    width="20"
-                    height="20"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                  >
-                    <path d="M12 17a2 2 0 0 0 4 0m-2-2v-2a4 4 0 1 0-8 0v2a2 2 0 0 0 4 0v-2" />
-                  </svg>
+                  <MdKey size={20} />
                 </span>
                 <input
                   id="password"
@@ -122,27 +130,9 @@ const Login = () => {
                   tabIndex={-1}
                 >
                   {showPassword ? (
-                    // Eye OFF Icon
-                    <svg
-                      width="20"
-                      height="20"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                    >
-                      <path d="M17.94 17.94A10 10 0 0 0 2.06 4.06M9 9a3 3 0 0 1 3 3m-3 0a3 3 0 0 0 3-3m0 0L2 2m16 16l-5-5"></path>
-                    </svg>
+                    <IoEyeOffOutline size={20} />
                   ) : (
-                    // Eye Icon
-                    <svg
-                      width="20"
-                      height="20"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                    >
-                      <path d="M1 10s4-7 9-7 9 7 9 7-4 7-9 7-9-7-9-7zm9 3a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"></path>
-                    </svg>
+                    <IoEyeOutline size={20} />
                   )}
                 </button>
               </div>
@@ -168,6 +158,14 @@ const Login = () => {
           </div>
         </div>
       </div>
+
+      {/* OTP Modal */}
+      {/* <OTPModal
+        isOpen={showOtpModal}
+        
+        email={email}
+        isLoading={isOtpLoading}
+      /> */}
     </div>
   );
 };

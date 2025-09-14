@@ -1,12 +1,13 @@
 import React from "react";
 import { useParams } from "react-router-dom";
-import SubEventsData from "../Data/SubEvent.json";
 import PassTable from "../Components/PassTable";
+import mockData from '../Data/MockData.json';
+const { SubEventsData } = mockData;
 
 function SubEventDetail() {
   const { subEventId } = useParams();
   const subEvent = SubEventsData.find(
-    (event) => String(event.subEventId) === String(subEventId)
+    (event) =>  String(event.id) === String(subEventId)
   );
 
   if (!subEvent) {

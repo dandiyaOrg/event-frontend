@@ -14,7 +14,6 @@ const CustomizableTable = ({
   data,
   initialColumns,
   allColumns = [],
-  rowsPerPageOptions = [10, 25, 50, 100],
   onRowClick,
   onEdit,  // Add this
   onDelete // Add this
@@ -25,7 +24,8 @@ const CustomizableTable = ({
   );
   const [showColumnDropdown, setShowColumnDropdown] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-  const [rowsPerPage, setRowsPerPage] = useState(rowsPerPageOptions[0]);
+  const rowsPerPage = 25;
+
 
   // Use provided data or fallback to empty array if no data
   const useData = data && data.length ? data : [];
@@ -155,8 +155,8 @@ const CustomizableTable = ({
     <div className="bg-gray-200 text-gray-100 rounded-lg overflow-hidden">
       {/* Header with Customize Columns */}
       <div className="flex justify-between items-center p-4 border-b border-gray-700">
-        <div className="text-sm text-gray-800">
-          {selectedRows.size} of {useData.length} row(s) selected.
+        <div className="text-sm text-gray-800 font-semibold">
+           Total Rows - {useData.length}
         </div>
 
         <div className="relative">
@@ -269,24 +269,8 @@ const CustomizableTable = ({
       </div>
 
       {/* Footer with Pagination */}
-      <div className="flex items-center justify-between p-4 border-t border-gray-700">
-        <div className="flex items-center gap-4">
-          <span className="text-sm text-gray-800">Rows per page</span>
-          <select
-            value={rowsPerPage}
-            onChange={(e) => {
-              setRowsPerPage(Number(e.target.value));
-              setCurrentPage(1);
-            }}
-            className="bg-gray-800 border border-gray-600 rounded px-2 py-1 text-sm"
-          >
-            {rowsPerPageOptions.map((option) => (
-              <option key={option} value={option}>
-                {option}
-              </option>
-            ))}
-          </select>
-        </div>
+      <div className="flex items-center font-semibold  justify-end p-4 border-t border-gray-700">
+        
 
         <div className="flex items-center gap-4">
           <span className="text-sm text-gray-800">
@@ -296,30 +280,30 @@ const CustomizableTable = ({
             <button
               onClick={() => setCurrentPage(1)}
               disabled={currentPage === 1}
-              className="p-1 hover:bg-gray-700 rounded disabled:opacity-50 disabled:cursor-not-allowed"
+              className="p-1 hover:bg-gray-300 rounded disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              <ChevronsLeft className="w-4 h-4" />
+              <ChevronsLeft className="w-4 h-4 text-black" />
             </button>
             <button
               onClick={() => setCurrentPage(currentPage - 1)}
               disabled={currentPage === 1}
-              className="p-1 hover:bg-gray-700 rounded disabled:opacity-50 disabled:cursor-not-allowed"
+              className="p-1 hover:bg-gray-300 rounded disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              <ChevronLeft className="w-4 h-4" />
+              <ChevronLeft className="w-4 h-4 text-black" />
             </button>
             <button
               onClick={() => setCurrentPage(currentPage + 1)}
               disabled={currentPage === totalPages}
-              className="p-1 hover:bg-gray-700 rounded disabled:opacity-50 disabled:cursor-not-allowed"
+              className="p-1 hover:bg-gray-300 rounded disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              <ChevronRight className="w-4 h-4" />
+              <ChevronRight className="w-4 h-4 text-black" />
             </button>
             <button
               onClick={() => setCurrentPage(totalPages)}
               disabled={currentPage === totalPages}
-              className="p-1 hover:bg-gray-700 rounded disabled:opacity-50 disabled:cursor-not-allowed"
+              className="p-1 hover:bg-gray-300 rounded disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              <ChevronsRight className="w-4 h-4" />
+              <ChevronsRight className="w-4 h-4 text-black" />
             </button>
           </div>
         </div>
@@ -328,4 +312,4 @@ const CustomizableTable = ({
   );
 };
 
-export default CustomizableTable; 
+export default CustomizableTable;

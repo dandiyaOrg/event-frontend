@@ -1,43 +1,13 @@
 import React, { useState } from "react";
 import SearchBar from "../Components/SearchBar";
-import CustomizableTable from "../Components/CustomizableTable";
+import CustomizableTable from "../components/CustomizableTable";
 import CreateNewEmployee from "../Components/CreateNewEmployee";
-import EmployeeCard from "../Components/EmployeeCard"; // Import your separate card component
+import EmployeeCard from "../components/EmployeeCard"; // New component for employee details
+import mockData from '../Data/MockData.json';
 
-const initialEmployeeData = [
-  {
-    id: 1,
-    name: "Ravi Mehra",
-    username: "ravi.mehra",
-    mobileNumber: "+91 8884442211",
-    emailId: "ravi.mehra@company.com",
-    password: "password123",
-  },
-  {
-    id: 2,
-    name: "Anjali Kulkarni",
-    username: "anjali.k",
-    mobileNumber: "+91 9023445566",
-    emailId: "anjali.kulkarni@company.com",
-    password: "securepass456",
-  },
-  {
-    id: 3,
-    name: "Deepak Singh",
-    username: "deepak.singh",
-    mobileNumber: "+91 9811122233",
-    emailId: "deepak.singh@company.com",
-    password: "mypassword789",
-  },
-  {
-    id: 4,
-    name: "Kavita Sethi",
-    username: "kavita.s",
-    mobileNumber: "+91 9430111122",
-    emailId: "kavita.sethi@company.com",
-    password: "strongpass321",
-  },
-];
+
+const { employeesData } = mockData;
+
 
 const employeeColumns = [
   { key: "name", label: "Name" },
@@ -48,7 +18,7 @@ const employeeColumns = [
 ];
 
 const EmployeePage = () => {
-  const [employeeData, setEmployeeData] = useState(initialEmployeeData);
+  const [employeeData, setEmployeeData] = useState(employeesData);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showEmployeeCard, setShowEmployeeCard] = useState(false); // New state for card
   const [editingEmployee, setEditingEmployee] = useState(null);
