@@ -21,14 +21,15 @@ import Profile from "./Pages/Profile";
 import EventDetails from "./Pages/EventDetails";
 import SignUp from "./Pages/SignUp";
 import BillingUser from "./Pages/BillingUser";
+import BillingUserPage from "./Pages/BillingUserData"; 
 import Attendee from "./Pages/Attendee";
 import Orders from "./Pages/Orders";
+import OrderDetailsPage from "./Pages/OrderDetail";
 import EventDetailForm from "./Pages/EventDetailForm";
 import SubEventForm from "./Pages/SubEventForm";
 import SubEventDetails from "./Pages/SubEventDetail";
 import OtpPage from "./Pages/OtpPage.jsx";
-
-
+import AttendeeDetailsPage from "./Pages/AttendeeDetailPage";
 
 function ProtectedRoute({ children }) {
   const accessToken = useSelector(state => state.auth.accessToken);
@@ -64,9 +65,18 @@ const router = createBrowserRouter(
 
         <Route path="employees" element={<Employees />} />
         <Route path="transactions" element={<Transactions />} />
+        
+        {/* Billing Users Routes */}
         <Route path="billingUsers" element={<BillingUser />} />
+        <Route path="billingUsers/:userId" element={<BillingUserPage />} />
+        
         <Route path="attendee" element={<Attendee />} />
+        <Route path="attendee/:attendeeId" element={<AttendeeDetailsPage />} />
+
+
         <Route path="orders" element={<Orders />} />
+        <Route path="orders/:orderId" element={<OrderDetailsPage />} />
+
         <Route path="profile" element={<Profile />} />
       </Route>
     </>

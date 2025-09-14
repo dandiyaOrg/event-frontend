@@ -1,0 +1,106 @@
+{
+  "billingUsersData": [
+    {
+      "id": "BU001",
+      "name": "Rajesh Sharma",
+      "email": "rajesh.sharma@techsolutions.com",
+      "phone": "+91 98765 43210",
+      "company": "Tech Solutions Pvt Ltd",
+      "status": "Active",
+      "totalOrders": 25,
+      "totalSpent": 325000,
+      "registrationDate": "2024-01-15"
+    },
+    {
+      "id": "BU002",
+      "name": "Priya Patel",
+      "email": "priya.patel@digitalmarketing.com",
+      "phone": "+91 87654 32109",
+      "company": "Digital Marketing Co",
+      "status": "Active",
+      "totalOrders": 18,
+      "totalSpent": 189500,
+      "registrationDate": "2024-02-20"
+    },
+    {
+      "id": "BU003",
+      "name": "Amit Kumar",
+      "email": "amit.kumar@eventmasters.in",
+      "phone": "+91 76543 21098",
+      "company": "Event Masters",
+      "status": "Inactive",
+      "totalOrders": 12,
+      "totalSpent": 167800,
+      "registrationDate": "2024-01-10"
+    },
+    {
+      "id": "BU004",
+      "name": "Sneha Reddy",
+      "email": "sneha.reddy@corporateevents.com",
+      "phone": "+91 65432 10987",
+      "company": "Corporate Events Ltd",
+      "status": "Pending",
+      "totalOrders": 8,
+      "totalSpent": 95600,
+      "registrationDate": "2024-03-05"
+    },
+    {
+      "id": "BU005",
+      "name": "Vikram Singh",
+      "email": "vikram.singh@weddings.co.in",
+      "phone": "+91 54321 09876",
+      "company": "Premium Weddings",
+      "status": "Active",
+      "totalOrders": 35,
+      "totalSpent": 450000,
+      "registrationDate": "2023-12-01"
+    }
+  ],
+  "ordersData": [
+    {
+      "id": "ORD001",
+      "billingUserId": "BU001",
+      "eventName": "Annual Tech Conference 2024",
+      "orderDate": "2024-03-10",
+      "amount": 85000,
+      "status": "Completed",
+      "attendees": 250
+    },
+    {
+      "id": "ORD002",
+      "billingUserId": "BU001",
+      "eventName": "Product Launch Event",
+      "orderDate": "2024-03-15",
+      "amount": 65000,
+      "status": "Completed",
+      "attendees": 120
+    },
+    {
+      "id": "ORD003",
+      "billingUserId": "BU002",
+      "eventName": "Marketing Workshop",
+      "orderDate": "2024-03-12",
+      "amount": 35000,
+      "status": "In Progress",
+      "attendees": 75
+    },
+    {
+      "id": "ORD004",
+      "billingUserId": "BU001",
+      "eventName": "Team Building Activity",
+      "orderDate": "2024-03-20",
+      "amount": 42000,
+      "status": "Pending",
+      "attendees": 50
+    },
+    {
+      "id": "ORD005",
+      "billingUserId": "BU005",
+      "eventName": "Wedding Reception",
+      "orderDate": "2024-02-28",
+      "amount": 180000,
+      "status": "Completed",
+      "attendees": 300
+    }
+  ]
+}
