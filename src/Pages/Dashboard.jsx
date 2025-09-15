@@ -17,7 +17,7 @@ import {
   ArrowUpRight,
   ArrowDownRight,
 } from "lucide-react";
-import CustomizableTable from "../components/CustomizableTable";
+import CustomizableTable from "../Components/CustomizableTable";
 import AnalyticsModal from "../Components/Analytics/AnalyticsModal";
 
 
