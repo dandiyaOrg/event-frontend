@@ -33,17 +33,7 @@ const BillingUserPage = () => {
     navigate(`/orders/${order.id}`, { state: { order } });
   };
 
-  const handleOrderEdit = (order) => {
-    console.log('Edit order:', order);
-    alert(`Edit order: ${order.id}`);
-  };
 
-  const handleOrderDelete = (order) => {
-    console.log('Delete order:', order);
-    if (window.confirm(`Are you sure you want to delete order ${order.id}?`)) {
-      alert(`Deleted order: ${order.id}`);
-    }
-  };
 
   if (!billingUser) {
     return (
@@ -121,9 +111,6 @@ const BillingUserPage = () => {
               allColumns={orderColumns}
               initialColumns={initialOrderColumns}
               onRowClick={handleOrderRowClick}
-              onEdit={handleOrderEdit}
-              onDelete={handleOrderDelete}
-              rowsPerPageOptions={[5, 10, 25]}
             />
           ) : (
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-12 text-center">
