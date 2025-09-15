@@ -1,4 +1,4 @@
-// src/components/OrderCard.jsx
+// src/Component/OrderCard.jsx
 import React from 'react';
 
 const OrderCard = ({ order }) => {

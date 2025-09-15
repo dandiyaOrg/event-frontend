@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import SearchBar from "../Components/SearchBar";
-import CustomizableTable from "../Components/CustomizableTable";
+import SearchBar from "../Component/SearchBar";
+import CustomizableTable from "../Component/CustomizableTable";
 
 const transactionData = [
   {

@@ -1,8 +1,8 @@
 // src/pages/OrderDetailsPage.jsx
 import React from 'react';
 import { useParams, useLocation, useNavigate } from 'react-router-dom';
-import OrderCard from '../Components/OrderCard';
-import CustomizableTable from '../Components/CustomizableTable';
+import OrderCard from '../Component/OrderCard';
+import CustomizableTable from '../Component/CustomizableTable';
 import mockData from '../Data/MockData.json';
 
 const { ordersData, attendeesData } = mockData;

@@ -1,4 +1,4 @@
-// src/components/BillingUserCard.jsx
+// src/Component/BillingUserCard.jsx
 import React from 'react';
 
 const BillingUserCard = ({ billingUser }) => {

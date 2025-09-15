@@ -1,8 +1,8 @@
 import React from "react";
 import { useSelector } from "react-redux";
-import ProfileCard from "../Components/ProfileCard";
-import ProfileSidebar from "../Components/ProfileSidebar";
-import BioGraph from "../Components/ProfileBio";
+import ProfileCard from "../Component/ProfileCard";
+import ProfileSidebar from "../Component/ProfileSidebar";
+import BioGraph from "../Component/ProfileBio";
 
 const UserProfilePage = () => {
   const isLogin = useSelector((state) => state.auth.isLogin);

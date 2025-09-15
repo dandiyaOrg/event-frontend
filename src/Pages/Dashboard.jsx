@@ -17,8 +17,8 @@ import {
   ArrowUpRight,
   ArrowDownRight,
 } from "lucide-react";
-import CustomizableTable from "../Components/CustomizableTable";
-import AnalyticsModal from "../Components/Analytics/AnalyticsModal";
+import CustomizableTable from "../Component/CustomizableTable";
+import AnalyticsModal from "../Component/Analytics/AnalyticsModal";
 
 
 import mockData from '../Data/MockData.json';

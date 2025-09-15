@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import EventCard from '../Components/EventCard';  
-import SearchBar from '../Components/SearchBar';
+import EventCard from '../Component/EventCard';  
+import SearchBar from '../Component/SearchBar';
 
 // ✅ STEP 1: Import mockData safely
 import mockData from '../Data/MockData.json';

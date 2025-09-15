@@ -1,6 +1,6 @@
 import React from "react";
-import InputField from "../Components/Input";
-import DatePicker from "../Components/DatePicker";
+import InputField from "../Component/Input";
+import DatePicker from "../Component/DatePicker";
 import { useNavigate } from "react-router-dom";
 
 function App() {

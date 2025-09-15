@@ -1,7 +1,7 @@
 // src/pages/Orders.jsx
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import CustomizableTable from '../components/CustomizableTable';
+import CustomizableTable from '../Component/CustomizableTable';
 import mockData from '../Data/MockData.json';
 
 const { ordersData } = mockData;

@@ -1,4 +1,4 @@
-// src/components/analytics/EventsAnalytics.jsx
+// src/Component/analytics/EventsAnalytics.jsx
 import React from 'react';
 import {
   BarChart,

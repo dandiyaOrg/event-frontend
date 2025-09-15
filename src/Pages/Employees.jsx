@@ -1,8 +1,8 @@
 import React, { useState } from "react";
-import SearchBar from "../Components/SearchBar";
-import CustomizableTable from "../Components/CustomizableTable";
-import CreateNewEmployee from "../Components/CreateNewEmployee";
-import EmployeeCard from "../Components/EmployeeCard"; // New component for employee details
+import SearchBar from "../Component/SearchBar";
+import CustomizableTable from "../Component/CustomizableTable";
+import CreateNewEmployee from "../Component/CreateNewEmployee";
+import EmployeeCard from "../Component/EmployeeCard"; // New component for employee details
 import mockData from '../Data/MockData.json';
 
 

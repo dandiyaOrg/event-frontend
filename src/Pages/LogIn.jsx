@@ -8,7 +8,7 @@ import SignUp from "./SignUp";
 import { MdKey } from "react-icons/md";
 import { IoEyeOffOutline } from "react-icons/io5";
 import { IoEyeOutline } from "react-icons/io5";
-import OTPModal from "../Components/OtpModal"; // Import the OTP Modal component
+import OTPModal from "../Component/OtpModal"; // Import the OTP Modal component
 
 
 const IMAGE_URL =

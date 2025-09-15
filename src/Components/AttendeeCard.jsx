@@ -1,4 +1,4 @@
-// src/components/AttendeeCard.jsx
+// src/Component/AttendeeCard.jsx
 import React from 'react';
 
 const AttendeeCard = ({ attendee }) => {

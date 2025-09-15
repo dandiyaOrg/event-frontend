@@ -1,8 +1,8 @@
 // src/pages/BillingUserPage.jsx
 import React from 'react';
 import { useParams, useLocation, useNavigate } from 'react-router-dom';
-import BillingUserCard from '../components/BillingUserCard';
-import CustomizableTable from '../components/CustomizableTable'; // Your original table
+import BillingUserCard from '../Component/BillingUserCard';
+import CustomizableTable from '../Component/CustomizableTable'; // Your original table
 import mockData from '../Data/MockData.json';
 
 const { billingUsersData, ordersData } = mockData;

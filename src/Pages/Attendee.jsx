@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import CustomizableTable from '../Components/CustomizableTable';
+import CustomizableTable from '../Component/CustomizableTable';
 import mockData from '../Data/MockData.json';
 
 const Attendee = () => {

@@ -8,8 +8,8 @@ import { Link } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 
 
-import { toggleDarkMode } from '../features/ThemeSlice';
-import { toggleCollapse } from '../features/CollapsedSlice'; 
+import { toggleDarkMode } from '../features/UI/ThemeSlice';
+import { toggleCollapse } from '../features/UI/CollapsedSlice'; 
 
 
 

@@ -3,6 +3,7 @@ import { setCredentials, logout, setSession } from './authSlice';
 import { BASE_URL } from '../../config/baseUrl.js';
 
 const baseQuery = fetchBaseQuery({
+    
     baseUrl: BASE_URL,
     prepareHeaders: (headers, { getState }) => {
         const { accessToken, adminId } = getState().auth;

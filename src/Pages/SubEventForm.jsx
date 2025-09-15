@@ -1,7 +1,7 @@
 import React from "react";
-import InputField from "../Components/Input";
-import CustomDatePicker from "../Components/CustomDatePicker";
-import { TimePicker } from "../Components/TimePicker";
+import InputField from "../Component/Input";
+import CustomDatePicker from "../Component/CustomDatePicker";
+import { TimePicker } from "../Component/TimePicker";
 import { useNavigate } from "react-router-dom";
 
 
