@@ -13,41 +13,117 @@ import {
   EyeOff,
   AlertCircle
 } from 'lucide-react';
+import { useRegisterEmployeeMutation } from '../features/employee/employeeApi';
+
+// InputField component moved outside to prevent re-creation on each render
+const InputField = ({ 
+  label, 
+  name, 
+  type = 'text', 
+  icon: Icon, 
+  required = false, 
+  formData,
+  handleChange,
+  errors,
+  showPassword,
+  setShowPassword,
+  showConfirmPassword,
+  setShowConfirmPassword,
+  ...props 
+}) => (
+  <div className="space-y-2">
+    <label htmlFor={name} className="block text-sm font-semibold text-gray-700">
+      {label} {required && <span className="text-red-500">*</span>}
+    </label>
+    <div className="relative">
+      {Icon && (
+        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+          <Icon className="h-5 w-5 text-gray-400" />
+        </div>
+      )}
+      <input
+        type={
+          name === 'password'
+            ? (showPassword ? 'text' : 'password')
+            : name === 'confirmPassword'
+            ? (showConfirmPassword ? 'text' : 'password')
+            : type
+        }
+        id={name}
+        name={name}
+        value={formData[name] || ''}
+        onChange={handleChange}
+        className={`w-full ${Icon ? 'pl-10' : 'pl-4'} pr-10 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ${
+          errors[name] 
+            ? 'border-red-500 bg-red-50' 
+            : 'border-gray-300 hover:border-gray-400 focus:border-blue-500'
+        }`}
+        {...props}
+      />
+      {name === 'password' && (
+        <button
+          type="button"
+          onClick={() => setShowPassword(!showPassword)}
+          className="absolute inset-y-0 right-0 pr-3 flex items-center"
+        >
+          {showPassword ? (
+            <EyeOff className="h-5 w-5 text-gray-400 hover:text-gray-600" />
+          ) : (
+            <Eye className="h-5 w-5 text-gray-400 hover:text-gray-600" />
+          )}
+        </button>
+      )}
+      {name === 'confirmPassword' && (
+        <button
+          type="button"
+          onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+          className="absolute inset-y-0 right-0 pr-3 flex items-center"
+        >
+          {showConfirmPassword ? (
+            <EyeOff className="h-5 w-5 text-gray-400 hover:text-gray-600" />
+          ) : (
+            <Eye className="h-5 w-5 text-gray-400 hover:text-gray-600" />
+          )}
+        </button>
+      )}
+    </div>
+    {errors[name] && (
+      <div className="flex items-center space-x-1 text-red-600 text-sm">
+        <AlertCircle className="w-4 h-4" />
+        <span>{errors[name]}</span>
+      </div>
+    )}
+  </div>
+);
 
 const AddNewEmployee = () => {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false); 
+  const [registerEmployee, { isLoading }] = useRegisterEmployeeMutation();
   const [errors, setErrors] = useState({});
-
+  
   const [formData, setFormData] = useState({
     name: '',
     username: '',
-    emailId: '',
-    mobileNumber: '',
+    email: '',
+    mobile_no: '',
     password: '',
     confirmPassword: '',
-    department: '',
-    position: '',
-    startDate: '',
-    salary: '',
-    address: '',
-    emergencyContact: '',
-    notes: ''
   });
 
   // Handle input changes
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
+    setFormData(prevData => ({
+      ...prevData,
       [name]: value
     }));
     
     // Clear error when user starts typing
     if (errors[name]) {
-      setErrors(prev => ({
-        ...prev,
+      setErrors(prevData => ({
+        ...prevData,
         [name]: ''
       }));
     }
@@ -60,24 +136,21 @@ const AddNewEmployee = () => {
     // Required field validation
     if (!formData.name.trim()) newErrors.name = 'Name is required';
     if (!formData.username.trim()) newErrors.username = 'Username is required';
-    if (!formData.emailId.trim()) newErrors.emailId = 'Email is required';
-    if (!formData.mobileNumber.trim()) newErrors.mobileNumber = 'Mobile number is required';
+    if (!formData.email.trim()) newErrors.email = 'Email is required';
+    if (!formData.mobile_no.trim()) newErrors.mobile_no = 'Mobile number is required';
     if (!formData.password) newErrors.password = 'Password is required';
     if (!formData.confirmPassword) newErrors.confirmPassword = 'Confirm password is required';
-    if (!formData.department) newErrors.department = 'Department is required';
-    if (!formData.position.trim()) newErrors.position = 'Position is required';
-    if (!formData.startDate) newErrors.startDate = 'Start date is required';
 
     // Email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (formData.emailId && !emailRegex.test(formData.emailId)) {
-      newErrors.emailId = 'Please enter a valid email address';
+    if (formData.email && !emailRegex.test(formData.email)) {
+      newErrors.email = 'Please enter a valid email address';
     }
 
     // Phone validation
     const phoneRegex = /^[0-9]{10}$/;
-    if (formData.mobileNumber && !phoneRegex.test(formData.mobileNumber.replace(/\D/g, ''))) {
-      newErrors.mobileNumber = 'Please enter a valid 10-digit mobile number';
+    if (formData.mobile_no && !phoneRegex.test(formData.mobile_no.replace(/\D/g, ''))) {
+      newErrors.mobile_no = 'Please enter a valid 10-digit mobile number';
     }
 
     // Password validation
@@ -91,8 +164,8 @@ const AddNewEmployee = () => {
     }
 
     // Username validation
-    if (formData.username && formData.username.length < 3) {
-      newErrors.username = 'Username must be at least 3 characters';
+    if (formData.username && formData.username.length < 6) {
+      newErrors.username = 'Username must be at least 6 characters';
     }
 
     return newErrors;
@@ -107,12 +180,13 @@ const AddNewEmployee = () => {
       setErrors(validationErrors);
       return;
     }
-
-    setIsSubmitting(true);
     
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      // Create payload without confirmPassword
+      const { confirmPassword, ...employeeData } = formData;
+      
+      // Call the API
+      await registerEmployee(employeeData).unwrap();
       
       // Success - redirect to employees list
       navigate('/employees', { 
@@ -122,59 +196,18 @@ const AddNewEmployee = () => {
       });
     } catch (error) {
       console.error('Error adding employee:', error);
-      setErrors({ submit: 'Failed to add employee. Please try again.' });
-    } finally {
-      setIsSubmitting(false);
-    }
+      
+      // Handle API errors
+      if (error?.data?.message) {
+        setErrors({ submit: error.data.message });
+      } else if (error?.data?.errors) {
+        // Handle validation errors from backend
+        setErrors(error.data.errors);
+      } else {
+        setErrors({ submit: 'Failed to add employee. Please try again.' });
+      }
+    } 
   };
-
-  // Input field component for reusability
-  const InputField = ({ label, name, type = 'text', icon: Icon, required = false, ...props }) => (
-    <div className="space-y-2">
-      <label htmlFor={name} className="block text-sm font-semibold text-gray-700">
-        {label} {required && <span className="text-red-500">*</span>}
-      </label>
-      <div className="relative">
-        {Icon && (
-          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <Icon className="h-5 w-5 text-gray-400" />
-          </div>
-        )}
-        <input
-          type={type}
-          id={name}
-          name={name}
-          value={formData[name]}
-          onChange={handleChange}
-          className={`w-full ${Icon ? 'pl-10' : 'pl-4'} pr-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ${
-            errors[name] 
-              ? 'border-red-500 bg-red-50' 
-              : 'border-gray-300 hover:border-gray-400 focus:border-blue-500'
-          }`}
-          {...props}
-        />
-        {type === 'password' && name === 'password' && (
-          <button
-            type="button"
-            onClick={() => setShowPassword(!showPassword)}
-            className="absolute inset-y-0 right-0 pr-3 flex items-center"
-          >
-            {showPassword ? (
-              <EyeOff className="h-5 w-5 text-gray-400 hover:text-gray-600" />
-            ) : (
-              <Eye className="h-5 w-5 text-gray-400 hover:text-gray-600" />
-            )}
-          </button>
-        )}
-      </div>
-      {errors[name] && (
-        <div className="flex items-center space-x-1 text-red-600 text-sm">
-          <AlertCircle className="w-4 h-4" />
-          <span>{errors[name]}</span>
-        </div>
-      )}
-    </div>
-  );
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -225,6 +258,13 @@ const AddNewEmployee = () => {
                 icon={User}
                 placeholder="John Doe"
                 required
+                formData={formData}
+                handleChange={handleChange}
+                errors={errors}
+                showPassword={showPassword}
+                setShowPassword={setShowPassword}
+                showConfirmPassword={showConfirmPassword}
+                setShowConfirmPassword={setShowConfirmPassword}
               />
               
               <InputField
@@ -233,112 +273,45 @@ const AddNewEmployee = () => {
                 icon={User}
                 placeholder="johndoe"
                 required
+                formData={formData}
+                handleChange={handleChange}
+                errors={errors}
+                showPassword={showPassword}
+                setShowPassword={setShowPassword}
+                showConfirmPassword={showConfirmPassword}
+                setShowConfirmPassword={setShowConfirmPassword}
               />
               
               <InputField
                 label="Email Address"
-                name="emailId"
+                name="email"
                 type="email"
                 icon={Mail}
                 placeholder="john@company.com"
                 required
+                formData={formData}
+                handleChange={handleChange}
+                errors={errors}
+                showPassword={showPassword}
+                setShowPassword={setShowPassword}
+                showConfirmPassword={showConfirmPassword}
+                setShowConfirmPassword={setShowConfirmPassword}
               />
               
               <InputField
                 label="Mobile Number"
-                name="mobileNumber"
+                name="mobile_no"
                 type="tel"
                 icon={Phone}
                 placeholder="9876543210"
                 required
-              />
-
-              <InputField
-                label="Emergency Contact"
-                name="emergencyContact"
-                type="tel"
-                icon={Phone}
-                placeholder="9876543210"
-              />
-
-              <div className="space-y-2">
-                <label htmlFor="address" className="block text-sm font-semibold text-gray-700">
-                  Address
-                </label>
-                <textarea
-                  id="address"
-                  name="address"
-                  rows={3}
-                  value={formData.address}
-                  onChange={handleChange}
-                  placeholder="Enter full address"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent hover:border-gray-400 transition-all duration-200 resize-none"
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* Work Information Section */}
-          <div className="mb-8">
-            <div className="flex items-center space-x-2 mb-6">
-              <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
-                <Building2 className="w-5 h-5 text-purple-600" />
-              </div>
-              <h2 className="text-xl font-bold text-gray-900">Work Information</h2>
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-2">
-                <label htmlFor="department" className="block text-sm font-semibold text-gray-700">
-                  Department <span className="text-red-500">*</span>
-                </label>
-                <select
-                  id="department"
-                  name="department"
-                  value={formData.department}
-                  onChange={handleChange}
-                  className={`w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ${
-                    errors.department 
-                      ? 'border-red-500 bg-red-50' 
-                      : 'border-gray-300 hover:border-gray-400'
-                  }`}
-                >
-                  <option value="">Select Department</option>
-                  <option value="Engineering">Engineering</option>
-                  <option value="Marketing">Marketing</option>
-                  <option value="Sales">Sales</option>
-                  <option value="HR">Human Resources</option>
-                  <option value="Finance">Finance</option>
-                  <option value="Operations">Operations</option>
-                </select>
-                {errors.department && (
-                  <div className="flex items-center space-x-1 text-red-600 text-sm">
-                    <AlertCircle className="w-4 h-4" />
-                    <span>{errors.department}</span>
-                  </div>
-                )}
-              </div>
-
-              <InputField
-                label="Position"
-                name="position"
-                icon={Building2}
-                placeholder="Software Engineer"
-                required
-              />
-
-              <InputField
-                label="Start Date"
-                name="startDate"
-                type="date"
-                required
-              />
-
-              <InputField
-                label="Salary"
-                name="salary"
-                type="number"
-                placeholder="50000"
+                formData={formData}
+                handleChange={handleChange}
+                errors={errors}
+                showPassword={showPassword}
+                setShowPassword={setShowPassword}
+                showConfirmPassword={showConfirmPassword}
+                setShowConfirmPassword={setShowConfirmPassword}
               />
             </div>
           </div>
@@ -356,10 +329,17 @@ const AddNewEmployee = () => {
               <InputField
                 label="Password"
                 name="password"
-                type={showPassword ? 'text' : 'password'}
+                type="password"
                 icon={Lock}
                 placeholder="Enter secure password"
                 required
+                formData={formData}
+                handleChange={handleChange}
+                errors={errors}
+                showPassword={showPassword}
+                setShowPassword={setShowPassword}
+                showConfirmPassword={showConfirmPassword}
+                setShowConfirmPassword={setShowConfirmPassword}
               />
               
               <InputField
@@ -369,24 +349,13 @@ const AddNewEmployee = () => {
                 icon={Lock}
                 placeholder="Confirm password"
                 required
-              />
-            </div>
-          </div>
-
-          {/* Notes Section */}
-          <div className="mb-8">
-            <div className="space-y-2">
-              <label htmlFor="notes" className="block text-sm font-semibold text-gray-700">
-                Additional Notes
-              </label>
-              <textarea
-                id="notes"
-                name="notes"
-                rows={4}
-                value={formData.notes}
-                onChange={handleChange}
-                placeholder="Any additional information about the employee..."
-                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent hover:border-gray-400 transition-all duration-200 resize-none"
+                formData={formData}
+                handleChange={handleChange}
+                errors={errors}
+                showPassword={showPassword}
+                setShowPassword={setShowPassword}
+                showConfirmPassword={showConfirmPassword}
+                setShowConfirmPassword={setShowConfirmPassword}
               />
             </div>
           </div>
@@ -404,10 +373,10 @@ const AddNewEmployee = () => {
             
             <button
               type="submit"
-              disabled={isSubmitting}
+              disabled={isLoading}
               className="flex items-center justify-center space-x-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 disabled:cursor-not-allowed text-white rounded-xl font-medium transition-all duration-200 flex-1 sm:flex-none"
             >
-              {isSubmitting ? (
+              {isLoading ? (
                 <>
                   <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
                   <span>Adding...</span>

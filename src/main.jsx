@@ -17,6 +17,7 @@ import Dashboard from "./Pages/Dashboard";
 import Events from "./Pages/Events";
 import EventDetails from "./Pages/EventDetails";
 import EventDetailForm from "./Pages/EventDetailForm";
+import SubEvent from "./Components/SubEvent.jsx";
 import SubEventForm from "./Pages/SubEventForm";
 import SubEventDetails from "./Pages/SubEventDetail";
 import Employees from "./Pages/Employees";
