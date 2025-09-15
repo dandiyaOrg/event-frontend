@@ -15,22 +15,22 @@ import {
 import Sidebar from "./Components/Sidebar";
 import Dashboard from "./Pages/Dashboard";
 import Events from "./Pages/Events";
+import EventDetails from "./Pages/EventDetails";
+import EventDetailForm from "./Pages/EventDetailForm";
+import SubEventForm from "./Pages/SubEventForm";
+import SubEventDetails from "./Pages/SubEventDetail";
 import Employees from "./Pages/Employees";
 import EmployeeDetail from "./Pages/EmployeeDetail.jsx"
 import EmployeeDetailForm from "./Pages/EmployeeDetailForm"
 import Transactions from "./Pages/Transactions";
 import TransactionDetail from "./Pages/TransactionDetail.jsx"
 import Profile from "./Pages/Profile";
-import EventDetails from "./Pages/EventDetails";
 import SignUp from "./Pages/SignUp";
 import BillingUser from "./Pages/BillingUser";
 import BillingUserPage from "./Pages/BillingUserData";
 import Attendee from "./Pages/Attendee";
 import Orders from "./Pages/Orders";
 import OrderDetailsPage from "./Pages/OrderDetail";
-import EventDetailForm from "./Pages/EventDetailForm";
-import SubEventForm from "./Pages/SubEventForm";
-import SubEventDetails from "./Pages/SubEventDetail";
 import OtpPage from "./Pages/OtpPage.jsx";
 import AttendeeDetailsPage from "./Pages/AttendeeDetailPage";
 
@@ -60,14 +60,15 @@ const router = createBrowserRouter(
         }
       >
         <Route index element={<Dashboard />} />
-        <Route path="events" element={<Events />} />
-        <Route path="/events/new" element={<EventDetailForm />} />
-        <Route path="/events/:eventId" element={<EventDetails />} />
-        <Route path="/subEvents/new" element={<SubEventForm />} />
-        <Route
-          path="/events/:eventId/:subEventId"
-          element={<SubEventDetails />}
-        />
+        {/* Main Events (parent list & detail) */}
+  <Route path="/events" element={<Events />} />
+  <Route path="/events/:eventId" element={<EventDetails />} />
+
+  {/* Sub-event Management (nested under eventId) */}
+  <Route path="/events/:eventId/sub-events" element={<SubEvent />} />
+  <Route path="/events/:eventId/sub-events/new" element={<SubEventForm />} />               // Add new subevent
+  <Route path="/events/:eventId/sub-events/:subEventId" element={<SubEventDetails />} />    // View subevent details
+  {/* <Route path="/events/:eventId/sub-events/:subEventId/edit" element={<SubEventEdit />} /> // Edit subevent */}
 
         {/* Employee Routes */}
         <Route path="/employees" element={<Employees />} />

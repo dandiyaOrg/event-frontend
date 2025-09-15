@@ -449,7 +449,7 @@
     }
   ],
 
-  "SubEventsData": [
+  "SubEvents": [
     {
       "id": "SUB001",
       "eventId": "EVT001",
