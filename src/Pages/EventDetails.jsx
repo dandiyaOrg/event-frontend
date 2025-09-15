@@ -1,8 +1,8 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 import mockData from "../Data/MockData.json";
-import SearchBar from "../Component/SearchBar";
-import SubEvent from "../Component/SubEvent";
+import SearchBar from "../Components/SearchBar";
+import SubEvent from "../Components/SubEvent";
 
 const EventDetails = () => {
   const { eventId } = useParams();

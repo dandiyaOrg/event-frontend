@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import Navbar from "../Component/Navbar";
+import Navbar from "../Components/Navbar";
 import { Outlet, NavLink } from "react-router-dom";
 import { IoMdMenu } from "react-icons/io";
 import { FaBars } from "react-icons/fa";

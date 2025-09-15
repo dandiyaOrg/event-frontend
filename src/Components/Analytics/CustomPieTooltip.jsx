@@ -1,4 +1,4 @@
-// src/Component/charts/CustomPieTooltip.jsx
+// src/Components/charts/CustomPieTooltip.jsx
 import React from 'react';
 
 const CustomPieTooltip = ({ active, payload, label }) => {

@@ -1,4 +1,4 @@
-// src/Component/analytics/CheckInsAnalytics.jsx
+// src/Components/analytics/CheckInsAnalytics.jsx
 import React from 'react';
 import {
   BarChart,

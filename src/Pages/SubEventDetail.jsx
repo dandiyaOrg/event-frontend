@@ -1,6 +1,6 @@
 import React from "react";
 import { useParams } from "react-router-dom";
-import PassTable from "../Component/PassTable";
+import PassTable from "../Components/PassTable";
 import mockData from '../Data/MockData.json';
 const { SubEventsData } = mockData;
 

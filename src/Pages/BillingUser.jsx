@@ -1,7 +1,7 @@
 // src/pages/BillingUsers.jsx
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import CustomizableTable from '../Component/CustomizableTable'; // Your original table
+import CustomizableTable from '../Components/CustomizableTable'; // Your original table
 import mockData from '../Data/MockData.json';
 
 const { billingUsersData } = mockData;

@@ -12,7 +12,7 @@ import {
   Outlet,
   Navigate,
 } from "react-router-dom";
-import Sidebar from "./Component/Sidebar";
+import Sidebar from "./Components/Sidebar";
 import Dashboard from "./Pages/Dashboard";
 import Events from "./Pages/Events";
 import Employees from "./Pages/Employees";

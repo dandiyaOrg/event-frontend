@@ -1,8 +1,8 @@
 
 import React from 'react';
 import { useParams, useLocation, useNavigate } from 'react-router-dom';
-import AttendeeCard from '../Component/AttendeeCard';
-import CustomizableTable from '../Component/CustomizableTable';
+import AttendeeCard from '../Components/AttendeeCard';
+import CustomizableTable from '../Components/CustomizableTable';
 import mockData from '../Data/MockData.json';
 
 

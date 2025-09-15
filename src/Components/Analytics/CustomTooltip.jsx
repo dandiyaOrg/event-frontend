@@ -1,4 +1,4 @@
-// src/Component/charts/CustomTooltip.jsx
+// src/Components/charts/CustomTooltip.jsx
 import React from 'react';
 
 const CustomTooltip = ({ active, payload, label }) => {
