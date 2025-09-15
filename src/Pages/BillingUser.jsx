@@ -1,45 +1,29 @@
-// src/pages/BillingUsers.jsx
-import React from 'react';
+
 import { useNavigate } from 'react-router-dom';
 import CustomizableTable from '../Components/CustomizableTable'; // Your original table
 import mockData from '../Data/MockData.json';
 
 const { billingUsersData } = mockData;
 
+// Define all possible columns for your customizable table
+const allColumns = [
+  { key: 'id', label: 'User ID' },
+  { key: 'name', label: 'Name' },
+  { key: 'email', label: 'Email' },
+  { key: 'phone', label: 'Phone' },
+  { key: 'company', label: 'Company' },
+  { key: 'totalOrders', label: 'Total Orders' },
+  { key: 'totalSpent', label: 'Total Spent' },
+  { key: 'status', label: 'Status' },
+  { key: 'registrationDate', label: 'Registration Date' },
+];
 const BillingUsers = () => {
+  
   const navigate = useNavigate();
-
-  // Define all possible columns for your customizable table
-  const allColumns = [
-    { key: 'id', label: 'User ID' },
-    { key: 'name', label: 'Name' },
-    { key: 'email', label: 'Email' },
-    { key: 'phone', label: 'Phone' },
-    { key: 'company', label: 'Company' },
-    { key: 'totalOrders', label: 'Total Orders' },
-    { key: 'totalSpent', label: 'Total Spent' },
-    { key: 'status', label: 'Status' },
-    { key: 'registrationDate', label: 'Registration Date' },
-  ];
-
-  // Initial visible columns
-  const initialColumns = ['id', 'name', 'email', 'company', 'totalOrders', 'totalSpent', 'status'];
-
   const handleRowClick = (billingUser) => {
     navigate(`/billingUsers/${billingUser.id}`, { state: { billingUser } });
   };
 
-  const handleEdit = (billingUser) => {
-    console.log('Edit billing user:', billingUser);
-    alert(`Edit user: ${billingUser.name}`);
-  };
-
-  const handleDelete = (billingUser) => {
-    console.log('Delete billing user:', billingUser);
-    if (window.confirm(`Are you sure you want to delete ${billingUser.name}?`)) {
-      alert(`Deleted user: ${billingUser.name}`);
-    }
-  };
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">
@@ -123,12 +107,9 @@ const BillingUsers = () => {
         {/* Your Original Customizable Table - No changes */}
         <CustomizableTable
           data={billingUsersData}
-          allColumns={allColumns}
-          initialColumns={initialColumns}
+          allColumns={allColumns}         
           onRowClick={handleRowClick}
-          onEdit={handleEdit}
-          onDelete={handleDelete}
-          rowsPerPageOptions={[5, 10, 25, 50]}
+          
         />
       </div>
     </div>

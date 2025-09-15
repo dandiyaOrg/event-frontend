@@ -1,13 +1,10 @@
-import React, { useState } from "react";
+import { useNavigate } from 'react-router-dom';
+import { useState } from 'react';
 import SearchBar from "../Components/SearchBar";
 import CustomizableTable from "../Components/CustomizableTable";
-import CreateNewEmployee from "../Components/CreateNewEmployee";
-import EmployeeCard from "../Components/EmployeeCard"; // New component for employee details
-import mockData from '../Data/MockData.json';
-
+import mockData from "../Data/MockData.json";
 
 const { employeesData } = mockData;
-
 
 const employeeColumns = [
   { key: "name", label: "Name" },
@@ -18,58 +15,25 @@ const employeeColumns = [
 ];
 
 const EmployeePage = () => {
-  const [employeeData, setEmployeeData] = useState(employeesData);
-  const [showCreateModal, setShowCreateModal] = useState(false);
-  const [showEmployeeCard, setShowEmployeeCard] = useState(false); // New state for card
-  const [editingEmployee, setEditingEmployee] = useState(null);
-  const [selectedEmployee, setSelectedEmployee] = useState(null); // New state for selected employee
+  const navigate = useNavigate();
+  const [searchTerm, setSearchTerm] = useState('');
 
-  const handleAddEmployee = () => {
-    setEditingEmployee(null);
-    setShowCreateModal(true);
+  // Navigate to add employee page
+  const handleNewEmployee = () => {
+    navigate('/employees/new');
   };
 
-  const handleCloseModal = () => {
-    setShowCreateModal(false);
-    setEditingEmployee(null);
-  };
-
-  const handleSubmitEmployee = (employeeInfo) => {
-    if (editingEmployee) {
-      // Update existing employee
-      setEmployeeData(prevData =>
-        prevData.map(emp =>
-          emp.id === editingEmployee.id ? { ...employeeInfo, id: editingEmployee.id } : emp
-        )
-      );
-    } else {
-      // Add new employee
-      setEmployeeData(prevData => [...prevData, employeeInfo]);
-    }
-  };
-
-  const handleEditEmployee = (employee) => {
-    setEditingEmployee(employee);
-    setShowCreateModal(true);
-  };
-
-  const handleDeleteEmployee = (employee) => {
-    if (window.confirm(`Are you sure you want to delete ${employee.name}?`)) {
-      setEmployeeData(prevData => prevData.filter(emp => emp.id !== employee.id));
-    }
-  };
-
-  // New function to handle row click and show employee card
+  // Navigate to employee details page
   const handleRowClick = (employee) => {
-    setSelectedEmployee(employee);
-    setShowEmployeeCard(true);
+    navigate(`/employees/${employee.id}`, { state: { employee } });
   };
 
-  // New function to close employee card
-  const handleCloseEmployeeCard = () => {
-    setShowEmployeeCard(false);
-    setSelectedEmployee(null);
-  };
+  // Filter employees based on search term
+  const filteredEmployees = employeesData.filter(employee =>
+    employee.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    employee.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    employee.emailId.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   return (
     <div className="px-8 min-h-screen bg-gray-50 space-y-8">
@@ -83,12 +47,14 @@ const EmployeePage = () => {
       {/* Controls */}
       <div className="flex justify-between items-center">
         <SearchBar 
-          placeholder="Search employees..." 
-          className="w-60" 
-        />
-        <button
+  placeholder="Search employees..."
+  className="w-60"
+  value={searchTerm}
+  onChange={setSearchTerm}  // Callback when value changes
+/>
+        <button 
+          onClick={handleNewEmployee} 
           className="border border-gray-400 bg-gray-200 text-gray-700 font-medium rounded-xl px-5 py-2 shadow hover:bg-gray-300 hover:border-gray-500 transition-all"
-          onClick={handleAddEmployee}
         >
           + New Employee
         </button>
@@ -97,29 +63,11 @@ const EmployeePage = () => {
       {/* Table */}
       <div className="bg-white rounded-xl shadow-sm">
         <CustomizableTable
-          data={employeeData}
+          data={filteredEmployees}
           allColumns={employeeColumns}
-          rowsPerPageOptions={[5, 10, 25]}
-          onEdit={handleEditEmployee}
-          onDelete={handleDeleteEmployee}
-          onRowClick={handleRowClick}
+          onRowClick={handleRowClick}  
         />
       </div>
-
-      {/* Create/Edit Employee Modal */}
-      <CreateNewEmployee
-        isOpen={showCreateModal}
-        onClose={handleCloseModal}
-        onSubmit={handleSubmitEmployee}
-        editingEmployee={editingEmployee}
-      />
-
-      {/* Employee Details Card - Using your separate component */}
-      <EmployeeCard
-        isOpen={showEmployeeCard}
-        onClose={handleCloseEmployeeCard}
-        employee={selectedEmployee}
-      />
     </div>
   );
 };
