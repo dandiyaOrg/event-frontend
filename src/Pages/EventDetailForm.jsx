@@ -1,43 +1,141 @@
-import React from "react";
-import InputField from "../Components/Input";
-import DatePicker from "../Components/DatePicker";
-import { useNavigate } from "react-router-dom";
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import InputField from '../Components/InputField';
+import { 
+  Calendar, 
+  MapPin, 
+  Globe, 
+  FileText, 
+  StickyNote, 
+  Upload,
+  Tag,
+  User
+} from 'lucide-react';
 
-function App() {
+const EventDetailForm = ({ onClose, onSuccess }) => {
+  const navigate = useNavigate();
 
-  const [eventName, setEventName] = React.useState("");
-    const navigate=useNavigate();
-  return (
-    <div className=" p-6 bg-gray-100 rounded-lg shadow-md">
-      <h2 className="text-3xl font-semibold mb-6 text-gray-800">Create New Event</h2>
+  // Single state object for all form data [attached_file:1]
+  const [formData, setFormData] = useState({
+    eventName: "",
+    eventType: "",
+    startDate: "",
+    endDate: "",
+    numberOfDays: "",
+    venue: "",
+    mapLink: "",
+    description: "",
+    extraNotes: "",
+  });
+
+  const [image, setImage] = useState(null);
+  const [imagePreview, setImagePreview] = useState("");
+
+  // Generic handle change function [attached_file:1]
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  // Image upload handler
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setImage(file);
       
-      <form className="flex flex-col gap-6">
-        
+      // Create preview URL
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  // Form submit handler
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    const submitData = new FormData();
+    Object.entries(formData).forEach(([key, value]) => {
+      submitData.append(key, value);
+    });
+    
+    if (image) {
+      submitData.append('image', image);
+    }
+
+    try {
+      // Replace with your actual API call
+      console.log('Form Data:', formData);
+      console.log('Image:', image);
+      
+      alert("Event created successfully!");
+      onSuccess?.("Event created successfully!");
+      navigate('/events');
+      
+    } catch (error) {
+      console.error('Failed to create event:', error);
+    }
+  };
+
+  return (
+    <div className="p-6 bg-gray-100 rounded-lg shadow-md">
+      <h2 className="text-3xl font-semibold mb-6 text-gray-800">Create New Event</h2>
+
+      <form onSubmit={handleSubmit} className="flex flex-col gap-6">
         {/* Event Name */}
         <InputField
-        label="Event Name"
-        id="event-name"
-        placeholder="Enter event name"
-        value={eventName}
-        onChange={(e) => setEventName(e.target.value)}
+          label="Event Name"
+          name="eventName"
+          type="text"
+          placeholder="Enter event name"
+          value={formData.eventName}
+          onChange={handleChange}
           width="w-1/2"
+        />
 
-      />
-        
-        {/* Dates & Number of Days */}
-        <DatePicker />
-
-        {/* Type of Event */}
+        {/* Event Type */}
         <InputField
           label="Type of Event"
+          name="eventType"
           type="text"
-          id="event-type"
           placeholder="Enter event type (e.g., Conference, Workshop)"
-          value=""
-          onChange={() => {}}
+          value={formData.eventType}
+          onChange={handleChange}
           width="w-1/2"
-         className=""
         />
+
+        {/* Date Fields */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <InputField
+            label="Start Date"
+            name="startDate"
+            type="date"
+            value={formData.startDate}
+            onChange={handleChange}
+          />
+
+          <InputField
+            label="End Date"
+            name="endDate"
+            type="date"
+            value={formData.endDate}
+            onChange={handleChange}
+          />
+
+          <InputField
+            label="Number of Days"
+            name="numberOfDays"
+            type="number"
+            placeholder="e.g., 3"
+            value={formData.numberOfDays}
+            onChange={handleChange}
+          />
+        </div>
 
         {/* Upload Image */}
         <div className="flex items-center gap-4">
@@ -51,69 +149,78 @@ function App() {
             type="file"
             id="upload-image"
             className="hidden"
+            accept="image/*"
+            onChange={handleImageChange}
           />
-          <span className="text-gray-500 text-sm italic">No file chosen</span> {/* You can update this dynamically */}
+          <span className="text-gray-500 text-sm italic">
+            {image ? image.name : "No file chosen"}
+          </span>
         </div>
+
+        {/* Image Preview */}
+        {imagePreview && (
+          <div className="mt-4">
+            <img 
+              src={imagePreview} 
+              alt="Event preview" 
+              className="w-32 h-32 object-cover rounded-lg border border-gray-200"
+            />
+          </div>
+        )}
 
         {/* Venue */}
         <InputField
           label="Venue"
+          name="venue"
           type="text"
-          id="venue"
           placeholder="Enter event venue"
-          value=""
-          onChange={() => {}}
+          value={formData.venue}
+          onChange={handleChange}
           width="w-1/2"
-         className=""
         />
 
         {/* Google Map Link */}
         <InputField
           label="Google Map Link"
+          name="mapLink"
           type="url"
-          id="map-link"
           placeholder="https://maps.google.com/..."
-          value=""
-          onChange={() => {}}
+          value={formData.mapLink}
+          onChange={handleChange}
           width="w-1/2"
-         className=""
         />
 
         {/* Description */}
         <InputField
           label="Description"
-          id="description"
+          name="description"
           placeholder="Enter event description"
-          value=""
-          onChange={() => {}}
+          value={formData.description}
+          onChange={handleChange}
           isTextarea={true}
           rows={5}
-          width=""
-         className=""
         />
 
         {/* Extra Notes */}
         <InputField
           label="Extra Notes"
-          id="extra-notes"
+          name="extraNotes"
           placeholder="Any additional information"
-          value=""
-          onChange={() => {}}
+          value={formData.extraNotes}
+          onChange={handleChange}
           isTextarea={true}
           rows={5}
-          width=""
-         className=""
         />
 
         {/* Buttons */}
         <div className="flex justify-end gap-4 pt-4">
           <button
-  type="button"
-  onClick={() => navigate(-1)}
-  className="px-4 py-2 border border-gray-400 rounded-md text-gray-700 hover:bg-gray-300 transition"
->
-  Cancel
-</button>
+            type="button"
+            onClick={() => navigate(-1)}
+            className="px-4 py-2 border border-gray-400 rounded-md text-gray-700 hover:bg-gray-300 transition"
+          >
+            Cancel
+          </button>
 
           <button
             type="submit"
@@ -122,10 +229,9 @@ function App() {
             Save
           </button>
         </div>
-
       </form>
     </div>
   );
-}
+};
 
-export default App;
+export default EventDetailForm;

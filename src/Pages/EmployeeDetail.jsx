@@ -1,5 +1,8 @@
 import React, { useState } from 'react';
 import { useParams, useLocation, useNavigate } from 'react-router-dom';
+import { useToggleStatusMutation } from '../features/employee/employeeApi';
+import { useDeleteEmployeeMutation } from '../features/employee/employeeApi';
+import ToggleSwitch from '../Components/ToggleSwitch';
 import { 
   ChevronLeft, 
   Mail, 
@@ -17,17 +20,24 @@ import {
   Trash2,
   Eye, 
   EyeOff,
+  AlertTriangle,
+  X
 } from 'lucide-react';
 
 const EmployeeDetail = () => {
-  const { employeeId } = useParams();
   const location = useLocation();
   const navigate = useNavigate();
+  const { employeeId } = useParams();
 
   const [showPassword, setShowPassword] = useState(false);
-
-  // Get employee data from state or find by ID
-  const employee = location.state?.employee || null;
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  
+  // ✅ Add local employee state to manage updates
+  const [employee, setEmployee] = useState(location.state?.employee || null);
+  
+  // RTK Query mutations
+  const [deleteEmployee, { isLoading: isDeleting }] = useDeleteEmployeeMutation();
+  const [toggleStatus, { isLoading }] = useToggleStatusMutation();
 
   console.log("Employee Detail:", employee);
 
@@ -52,12 +62,132 @@ const EmployeeDetail = () => {
   }
 
   const handleEdit = () => {
-    navigate(`/employees/${employee.id}/edit`, { state: { employee } });
+    navigate(`/employees/${employee.employee_id}/edit`, { state: { employee } });
   };
 
+  const handleDelete = () => {
+    setShowDeleteModal(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    try {
+      await deleteEmployee(employee.employee_id).unwrap();
+      alert('Employee deleted successfully!');
+      navigate('/employees');
+    } catch (error) {
+      console.error('Failed to delete employee:', error);
+      alert(error.data?.message || 'Failed to delete employee. Please try again.');
+    } finally {
+      setShowDeleteModal(false);
+    }
+  };
+
+  const handleCancelDelete = () => {
+    setShowDeleteModal(false);
+  };
+
+  //  Updated toggle handler with optimistic updates
+  const handleStatusToggle = async () => {
+    const currentStatus = employee.status;
+    const newStatus = currentStatus === 'active' ? 'inactive' : 'active';
+    
+    try {
+      //  Optimistic update - update UI immediately
+      setEmployee(prev => ({
+        ...prev,
+        status: newStatus
+      }));
+
+      // Call the API to toggle status
+      await toggleStatus(employee.employee_id).unwrap();
+      
+      // Show success message
+      alert(`Employee status updated to ${newStatus}`);
+      
+    } catch (error) {
+      console.error('Failed to toggle status:', error);
+      
+      // Revert the optimistic update if API call fails
+      setEmployee(prev => ({
+        ...prev,
+        status: currentStatus
+      }));
+      
+      alert('Failed to update employee status. Please try again.');
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {/* Delete Confirmation Modal */}
+      {showDeleteModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full mx-4">
+            {/* Modal Header */}
+            <div className="flex items-center justify-between p-6 border-b border-gray-200">
+              <div className="flex items-center space-x-3">
+                <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">
+                  <AlertTriangle className="w-5 h-5 text-red-600" />
+                </div>
+                <h3 className="text-lg font-semibold text-gray-900">Delete Employee</h3>
+              </div>
+              <button 
+                onClick={handleCancelDelete}
+                className="text-gray-400 hover:text-gray-600 transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Modal Body */}
+            <div className="p-6">
+              <p className="text-gray-600 mb-4">
+                Are you sure you want to delete <span className="font-semibold text-gray-900">{employee.name}</span>? 
+                This action cannot be undone.
+              </p>
+              
+              {/* Employee Info Preview */}
+              <div className="bg-gray-50 rounded-lg p-4 mb-6">
+                <div className="flex items-center space-x-3">
+                  <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center">
+                    <User className="w-5 h-5 text-gray-600" />
+                  </div>
+                  <div>
+                    <p className="font-medium text-gray-900">{employee.name}</p>
+                    <p className="text-sm text-gray-600">{employee.email}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Modal Footer */}
+            <div className="flex items-center justify-end space-x-3 p-6 border-t border-gray-200">
+              <button
+                onClick={handleCancelDelete}
+                disabled={isDeleting}
+                className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 disabled:opacity-50 transition-colors duration-200"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleConfirmDelete}
+                disabled={isDeleting}
+                className="px-4 py-2 text-sm font-medium text-white bg-red-600 border border-transparent rounded-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
+              >
+                {isDeleting ? (
+                  <div className="flex items-center">
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                    Deleting...
+                  </div>
+                ) : (
+                  'Delete Employee'
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Header */}
       <div className="bg-white border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-6 py-4">
@@ -72,6 +202,12 @@ const EmployeeDetail = () => {
               </button>
             </div>
             <div className="flex items-center space-x-3">
+              <ToggleSwitch
+                isActive={employee.status === 'active'}
+                onToggle={handleStatusToggle}
+                isLoading={isLoading}
+                employeeName={employee.name}
+              />
               <button 
                 onClick={handleEdit}
                 className="flex items-center space-x-2 bg-gray-900 hover:bg-gray-800 text-white px-4 py-2 rounded-xl font-medium transition-colors duration-200"
@@ -79,7 +215,11 @@ const EmployeeDetail = () => {
                 <Edit3 className="w-4 h-4" />
                 <span>Edit</span>
               </button>
-              <button className="flex items-center space-x-2 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-medium transition-colors duration-200">
+              <button 
+                onClick={handleDelete}
+                disabled={isDeleting}
+                className="flex items-center space-x-2 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-medium transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
                 <Trash2 className="w-4 h-4" />
                 <span>Delete</span>
               </button>
@@ -100,17 +240,21 @@ const EmployeeDetail = () => {
               
               {/* Profile Content */}
               <div className="relative px-6 pb-6">
-                {/* Avatar */}
-               
-
                 {/* Basic Info */}
                 <div className="text-center mb-6">
                   <h1 className="text-2xl font-bold text-gray-900 mb-1">{employee.name}</h1>
                   <p className="text-gray-600 mb-2">@{employee.username}</p>
                   <div className="flex items-center justify-center space-x-2">
-                    <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                      <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
-                      Active
+                    {/* ✅ Dynamic status badge based on current employee state */}
+                    <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
+                      employee.status === 'active' 
+                        ? 'bg-green-100 text-green-800' 
+                        : 'bg-red-100 text-red-800'
+                    }`}>
+                      <div className={`w-2 h-2 rounded-full mr-2 ${
+                        employee.status === 'active' ? 'bg-green-500' : 'bg-red-500'
+                      }`}></div>
+                      {employee.status === 'active' ? 'Active' : 'Inactive'}
                     </span>
                   </div>
                 </div>
@@ -136,6 +280,7 @@ const EmployeeDetail = () => {
             </div>
           </div>
 
+          {/* Rest of your component remains the same */}
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-8">
             {/* Personal Information */}
@@ -174,8 +319,6 @@ const EmployeeDetail = () => {
                       <p className="font-medium text-gray-900">@{employee.username}</p>
                     </div>
                   </div>
-                  
-                  
                 </div>
               </div>
             </div>
@@ -198,27 +341,25 @@ const EmployeeDetail = () => {
                     </div>
                   </div>
                   <div className="flex items-center space-x-2">
-                      <span className="text-sm text-gray-500">
-                        {showPassword ? employee.password : "••••••••"}
-                      </span>
+                    <span className="text-sm text-gray-500">
+                      {showPassword ? employee.password : "••••••••"}
+                    </span>
 
-                      <button
-                        type="button"
-                        onClick={() => setShowPassword((prev) => !prev)}
-                        className="focus:outline-none"
-                      >
-                        {showPassword ? (
-                          <EyeOff className="w-4 h-4 text-gray-500" />
-                        ) : (
-                          <Eye className="w-4 h-4 text-gray-500" />
-                        )}
-                      </button>
-                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword((prev) => !prev)}
+                      className="focus:outline-none"
+                    >
+                      {showPassword ? (
+                        <EyeOff className="w-4 h-4 text-gray-500" />
+                      ) : (
+                        <Eye className="w-4 h-4 text-gray-500" />
+                      )}
+                    </button>
+                  </div>
                 </div>
-
               </div>
             </div>
-
           </div>
         </div>
       </div>

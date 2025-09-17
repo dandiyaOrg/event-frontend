@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import InputField from '../Components/InputField'
 import { useNavigate } from 'react-router-dom';
 import { 
   ChevronLeft, 
@@ -6,95 +7,13 @@ import {
   Mail, 
   Phone, 
   Lock, 
-  Building2,
   Save,
   X,
-  Eye,
-  EyeOff,
   AlertCircle
 } from 'lucide-react';
 import { useRegisterEmployeeMutation } from '../features/employee/employeeApi';
 
-// InputField component moved outside to prevent re-creation on each render
-const InputField = ({ 
-  label, 
-  name, 
-  type = 'text', 
-  icon: Icon, 
-  required = false, 
-  formData,
-  handleChange,
-  errors,
-  showPassword,
-  setShowPassword,
-  showConfirmPassword,
-  setShowConfirmPassword,
-  ...props 
-}) => (
-  <div className="space-y-2">
-    <label htmlFor={name} className="block text-sm font-semibold text-gray-700">
-      {label} {required && <span className="text-red-500">*</span>}
-    </label>
-    <div className="relative">
-      {Icon && (
-        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-          <Icon className="h-5 w-5 text-gray-400" />
-        </div>
-      )}
-      <input
-        type={
-          name === 'password'
-            ? (showPassword ? 'text' : 'password')
-            : name === 'confirmPassword'
-            ? (showConfirmPassword ? 'text' : 'password')
-            : type
-        }
-        id={name}
-        name={name}
-        value={formData[name] || ''}
-        onChange={handleChange}
-        className={`w-full ${Icon ? 'pl-10' : 'pl-4'} pr-10 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ${
-          errors[name] 
-            ? 'border-red-500 bg-red-50' 
-            : 'border-gray-300 hover:border-gray-400 focus:border-blue-500'
-        }`}
-        {...props}
-      />
-      {name === 'password' && (
-        <button
-          type="button"
-          onClick={() => setShowPassword(!showPassword)}
-          className="absolute inset-y-0 right-0 pr-3 flex items-center"
-        >
-          {showPassword ? (
-            <EyeOff className="h-5 w-5 text-gray-400 hover:text-gray-600" />
-          ) : (
-            <Eye className="h-5 w-5 text-gray-400 hover:text-gray-600" />
-          )}
-        </button>
-      )}
-      {name === 'confirmPassword' && (
-        <button
-          type="button"
-          onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-          className="absolute inset-y-0 right-0 pr-3 flex items-center"
-        >
-          {showConfirmPassword ? (
-            <EyeOff className="h-5 w-5 text-gray-400 hover:text-gray-600" />
-          ) : (
-            <Eye className="h-5 w-5 text-gray-400 hover:text-gray-600" />
-          )}
-        </button>
-      )}
-    </div>
-    {errors[name] && (
-      <div className="flex items-center space-x-1 text-red-600 text-sm">
-        <AlertCircle className="w-4 h-4" />
-        <span>{errors[name]}</span>
-      </div>
-    )}
-  </div>
-);
+
 
 const AddNewEmployee = () => {
   const navigate = useNavigate();
@@ -252,6 +171,8 @@ const AddNewEmployee = () => {
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+            
               <InputField
                 label="Full Name"
                 name="name"

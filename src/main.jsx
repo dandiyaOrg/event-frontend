@@ -23,6 +23,7 @@ import SubEventDetails from "./Pages/SubEventDetail";
 import Employees from "./Pages/Employees";
 import EmployeeDetail from "./Pages/EmployeeDetail.jsx"
 import EmployeeDetailForm from "./Pages/EmployeeDetailForm"
+import EmployeeEditForm from "./Pages/EmployeeEditForm.jsx";
 import Transactions from "./Pages/Transactions";
 import TransactionDetail from "./Pages/TransactionDetail.jsx"
 import Profile from "./Pages/Profile";
@@ -65,6 +66,7 @@ const router = createBrowserRouter(
   <Route path="/events" element={<Events />} />
   <Route path="/events/:eventId" element={<EventDetails />} />
 
+
   {/* Sub-event Management (nested under eventId) */}
   <Route path="/events/:eventId/sub-events" element={<SubEvent />} />
   <Route path="/events/:eventId/sub-events/new" element={<SubEventForm />} />               // Add new subevent
@@ -75,6 +77,7 @@ const router = createBrowserRouter(
         <Route path="/employees" element={<Employees />} />
         <Route path="/employees/new" element={<EmployeeDetailForm />} />
         <Route path="/employees/:employeeId" element={<EmployeeDetail />} />
+        <Route path="/employees/:employeeId/edit" element={<EmployeeEditForm />} />
 
 
         {/* Transaction Routes  */}

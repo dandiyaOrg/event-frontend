@@ -30,7 +30,7 @@ const EmployeePage = () => {
 
   // Navigate to employee details page
   const handleRowClick = (employee) => {
-    navigate(`/employees/${employee.id}`, { state: { employee } });
+    navigate(`/employees/${employee.employee_id}`, { state: { employee } });
   };
 
   // Filter employees based on search term
