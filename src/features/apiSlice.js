@@ -4,7 +4,7 @@ import { BASE_URL } from '../config/baseUrl';
 export const apiSlice = createApi({
 
     reducerPath: 'api',
-    baseQuery: fetchBaseQuery({ 
+    baseQuery: fetchBaseQuery({     
         baseUrl: BASE_URL,
         prepareHeaders: (headers, { getState }) => {
             const { accessToken, adminId } = getState().auth;

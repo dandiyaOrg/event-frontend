@@ -7,6 +7,10 @@ export const employeeApi = apiSlice.injectEndpoints({
             query: (page) => `/employee?page=${page}`
         }),
 
+        getEmployeeById: builder.query({
+            query: (employeeId) => `/employee/${employeeId}`,
+        }),
+
         registerEmployee: builder.mutation({
             query: ( employee ) => ({
                 url: '/employee/register',
@@ -25,7 +29,8 @@ export const employeeApi = apiSlice.injectEndpoints({
         updateEmployee: builder.mutation({
             query: ({ employee, employeeId }) => ({
                 url: `/employee/${employeeId}`,
-                method: 'PUT'
+                method: 'PUT',
+                body:employee
             }) 
         }),
 
@@ -42,6 +47,7 @@ export const employeeApi = apiSlice.injectEndpoints({
 
 export const { 
     useGetEmployeesQuery, 
+    useGetEmployeeByIdQuery,
     useRegisterEmployeeMutation,
     useToggleStatusMutation,
     useUpdateEmployeeMutation,

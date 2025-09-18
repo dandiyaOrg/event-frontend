@@ -3,17 +3,17 @@ import { useNavigate } from 'react-router-dom';
 import EventCard from '../Components/EventCard';  
 import SearchBar from '../Components/SearchBar';
 
-// ✅ STEP 1: Import mockData safely
+//Import mockData safely
 import mockData from '../Data/MockData.json';
 
 function Events() {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
 
-  // ✅ STEP 2: Get events with safety checks
+  // Get events with safety checks
   const events = mockData?.events || [];
   
-  // ✅ STEP 3: Simple search filter
+  //Simple search filter
   const filteredEvents = events.filter(event => {
     if (!searchTerm) return true;
     const search = searchTerm.toLowerCase();
@@ -39,7 +39,7 @@ function Events() {
         </p>
       </div>
 
-      {/* Controls */}
+      {/* Controls
       <div className="flex justify-between items-center mb-8">
         <SearchBar
           placeholder="Search events..."
@@ -53,7 +53,7 @@ function Events() {
         >
           + New Event
         </button>
-      </div>
+      </div> */}
 
       {/* Event Cards */}
       <div className="space-y-6">
