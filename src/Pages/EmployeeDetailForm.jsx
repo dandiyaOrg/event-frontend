@@ -1,49 +1,49 @@
-import React, { useState } from 'react';
-import InputField from '../Components/InputField'
-import { useNavigate } from 'react-router-dom';
-import { 
-  ChevronLeft, 
-  User, 
-  Mail, 
-  Phone, 
-  Lock, 
+import React, { useState } from "react";
+import InputField from "../Components/InputField";
+import { useNavigate } from "react-router-dom";
+import ErrorPopup from "../Components/ErrorPopup";
+import {
+  ChevronLeft,
+  User,
+  Mail,
+  Phone,
+  Lock,
   Save,
   X,
-  AlertCircle
-} from 'lucide-react';
-import { useRegisterEmployeeMutation } from '../features/employee/employeeApi';
-
-
+  AlertCircle,
+} from "lucide-react";
+import { useRegisterEmployeeMutation } from "../features/employee/employeeApi";
 
 const AddNewEmployee = () => {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false); 
-  const [registerEmployee, { isLoading }] = useRegisterEmployeeMutation();
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [registerEmployee, { isLoading, isError, error }] =
+    useRegisterEmployeeMutation();
   const [errors, setErrors] = useState({});
-  
+
   const [formData, setFormData] = useState({
-    name: '',
-    username: '',
-    email: '',
-    mobile_no: '',
-    password: '',
-    confirmPassword: '',
+    name: "",
+    username: "",
+    email: "",
+    mobile_no: "",
+    password: "",
+    confirmPassword: "",
   });
 
   // Handle input changes
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prevData => ({
+    setFormData((prevData) => ({
       ...prevData,
-      [name]: value
+      [name]: value,
     }));
-    
+
     // Clear error when user starts typing
     if (errors[name]) {
-      setErrors(prevData => ({
+      setErrors((prevData) => ({
         ...prevData,
-        [name]: ''
+        [name]: "",
       }));
     }
   };
@@ -53,38 +53,43 @@ const AddNewEmployee = () => {
     const newErrors = {};
 
     // Required field validation
-    if (!formData.name.trim()) newErrors.name = 'Name is required';
-    if (!formData.username.trim()) newErrors.username = 'Username is required';
-    if (!formData.email.trim()) newErrors.email = 'Email is required';
-    if (!formData.mobile_no.trim()) newErrors.mobile_no = 'Mobile number is required';
-    if (!formData.password) newErrors.password = 'Password is required';
-    if (!formData.confirmPassword) newErrors.confirmPassword = 'Confirm password is required';
+    if (!formData.name.trim()) newErrors.name = "Name is required";
+    if (!formData.username.trim()) newErrors.username = "Username is required";
+    if (!formData.email.trim()) newErrors.email = "Email is required";
+    if (!formData.mobile_no.trim())
+      newErrors.mobile_no = "Mobile number is required";
+    if (!formData.password) newErrors.password = "Password is required";
+    if (!formData.confirmPassword)
+      newErrors.confirmPassword = "Confirm password is required";
 
     // Email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (formData.email && !emailRegex.test(formData.email)) {
-      newErrors.email = 'Please enter a valid email address';
+      newErrors.email = "Please enter a valid email address";
     }
 
     // Phone validation
     const phoneRegex = /^[0-9]{10}$/;
-    if (formData.mobile_no && !phoneRegex.test(formData.mobile_no.replace(/\D/g, ''))) {
-      newErrors.mobile_no = 'Please enter a valid 10-digit mobile number';
+    if (
+      formData.mobile_no &&
+      !phoneRegex.test(formData.mobile_no.replace(/\D/g, ""))
+    ) {
+      newErrors.mobile_no = "Please enter a valid 10-digit mobile number";
     }
 
     // Password validation
     if (formData.password && formData.password.length < 6) {
-      newErrors.password = 'Password must be at least 6 characters';
+      newErrors.password = "Password must be at least 6 characters";
     }
 
     // Confirm password validation
     if (formData.password !== formData.confirmPassword) {
-      newErrors.confirmPassword = 'Passwords do not match';
+      newErrors.confirmPassword = "Passwords do not match";
     }
 
     // Username validation
     if (formData.username && formData.username.length < 6) {
-      newErrors.username = 'Username must be at least 6 characters';
+      newErrors.username = "Username must be at least 6 characters";
     }
 
     return newErrors;
@@ -93,29 +98,29 @@ const AddNewEmployee = () => {
   // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     const validationErrors = validateForm();
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
       return;
     }
-    
+
     try {
       // Create payload without confirmPassword
       const { confirmPassword, ...employeeData } = formData;
-      
+
       // Call the API
       await registerEmployee(employeeData).unwrap();
-      
+
       // Success - redirect to employees list
-      navigate('/employees', { 
-        state: { 
-          message: `Employee ${formData.name} has been added successfully!` 
-        }
+      navigate("/employees", {
+        state: {
+          message: `Employee ${formData.name} has been added successfully!`,
+        },
       });
     } catch (error) {
-      console.error('Error adding employee:', error);
-      
+      console.error("Error adding employee:", error);
+
       // Handle API errors
       if (error?.data?.message) {
         setErrors({ submit: error.data.message });
@@ -123,9 +128,9 @@ const AddNewEmployee = () => {
         // Handle validation errors from backend
         setErrors(error.data.errors);
       } else {
-        setErrors({ submit: 'Failed to add employee. Please try again.' });
+        setErrors({ submit: "Failed to add employee. Please try again." });
       }
-    } 
+    }
   };
 
   return (
@@ -135,22 +140,27 @@ const AddNewEmployee = () => {
         <div className="max-w-4xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
-              <button 
-                onClick={() => navigate('/employees')} 
+              <button
+                onClick={() => navigate("/employees")}
                 className="flex items-center space-x-2 text-gray-600 hover:text-gray-900 transition-colors duration-200 group"
               >
                 <ChevronLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform duration-200" />
                 <span className="font-medium">Back to Employees</span>
               </button>
             </div>
-            <h1 className="text-2xl font-bold text-gray-900">Add New Employee</h1>
+            <h1 className="text-2xl font-bold text-gray-900">
+              Add New Employee
+            </h1>
           </div>
         </div>
       </div>
 
       {/* Form */}
       <div className="max-w-4xl mx-auto px-6 py-8">
-        <form onSubmit={handleSubmit} className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
+        <form
+          onSubmit={handleSubmit}
+          className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8"
+        >
           {/* Error Message */}
           {errors.submit && (
             <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl">
@@ -167,12 +177,12 @@ const AddNewEmployee = () => {
               <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
                 <User className="w-5 h-5 text-blue-600" />
               </div>
-              <h2 className="text-xl font-bold text-gray-900">Personal Information</h2>
+              <h2 className="text-xl font-bold text-gray-900">
+                Personal Information
+              </h2>
             </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 
-            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <InputField
                 label="Full Name"
                 name="name"
@@ -187,7 +197,7 @@ const AddNewEmployee = () => {
                 showConfirmPassword={showConfirmPassword}
                 setShowConfirmPassword={setShowConfirmPassword}
               />
-              
+
               <InputField
                 label="Username"
                 name="username"
@@ -202,7 +212,7 @@ const AddNewEmployee = () => {
                 showConfirmPassword={showConfirmPassword}
                 setShowConfirmPassword={setShowConfirmPassword}
               />
-              
+
               <InputField
                 label="Email Address"
                 name="email"
@@ -218,7 +228,7 @@ const AddNewEmployee = () => {
                 showConfirmPassword={showConfirmPassword}
                 setShowConfirmPassword={setShowConfirmPassword}
               />
-              
+
               <InputField
                 label="Mobile Number"
                 name="mobile_no"
@@ -245,7 +255,7 @@ const AddNewEmployee = () => {
               </div>
               <h2 className="text-xl font-bold text-gray-900">Security</h2>
             </div>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <InputField
                 label="Password"
@@ -262,7 +272,7 @@ const AddNewEmployee = () => {
                 showConfirmPassword={showConfirmPassword}
                 setShowConfirmPassword={setShowConfirmPassword}
               />
-              
+
               <InputField
                 label="Confirm Password"
                 name="confirmPassword"
@@ -285,13 +295,13 @@ const AddNewEmployee = () => {
           <div className="flex flex-col sm:flex-row gap-4 pt-6 border-t border-gray-200">
             <button
               type="button"
-              onClick={() => navigate('/employees')}
+              onClick={() => navigate("/employees")}
               className="flex items-center justify-center space-x-2 px-6 py-3 border-2 border-gray-300 text-gray-700 rounded-xl font-medium hover:bg-gray-50 hover:border-gray-400 transition-all duration-200"
             >
               <X className="w-4 h-4" />
               <span>Cancel</span>
             </button>
-            
+
             <button
               type="submit"
               disabled={isLoading}
@@ -311,6 +321,7 @@ const AddNewEmployee = () => {
             </button>
           </div>
         </form>
+        <ErrorPopup isError={isError} error={error} />
       </div>
     </div>
   );

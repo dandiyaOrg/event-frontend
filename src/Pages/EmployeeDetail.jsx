@@ -3,6 +3,7 @@ import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import { useToggleStatusMutation } from '../features/employee/employeeApi';
 import { useDeleteEmployeeMutation } from '../features/employee/employeeApi';
 import ToggleSwitch from '../Components/ToggleSwitch';
+import ErrorPopup from '../Components/ErrorPopup';
 import { 
   ChevronLeft, 
   Mail, 
@@ -36,8 +37,8 @@ const EmployeeDetail = () => {
   const [employee, setEmployee] = useState(location.state?.employee || null);
   
   // RTK Query mutations
-  const [deleteEmployee, { isLoading: isDeleting }] = useDeleteEmployeeMutation();
-  const [toggleStatus, { isLoading }] = useToggleStatusMutation();
+  const [deleteEmployee, { isLoading: isDeleting, isError,error}] = useDeleteEmployeeMutation();
+  const [toggleStatus, { isLoading: isToggling, isError: isToggleError, error: toggleError }] = useToggleStatusMutation();
 
   console.log("Employee Detail:", employee);
 
@@ -363,6 +364,10 @@ const EmployeeDetail = () => {
           </div>
         </div>
       </div>
+      <ErrorPopup
+        isError={isError} 
+        error={error} 
+      />
     </div>
   );
 };
