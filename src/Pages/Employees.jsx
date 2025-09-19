@@ -9,7 +9,6 @@ const employeeColumns = [
   { key: "username", label: "Username" },
   { key: "mobile_no", label: "Mobile Number" },
   { key: "email", label: "Email Id" },
-  { key: "password", label: "Password" },
 ];
 
 const EmployeePage = () => {
