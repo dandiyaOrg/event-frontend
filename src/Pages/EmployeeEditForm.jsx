@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useUpdateEmployeeMutation } from "../features/employee/employeeApi";
 import InputField from "../Components/InputField";
-import { useParams, useLocation,useNavigate } from "react-router-dom";
+import ErrorPopup from "../Components/ErrorPopup";
+import { useParams, useLocation, useNavigate } from "react-router-dom";
 import { User, Mail, Phone, Lock, UserCheck } from "lucide-react";
 
 const EmployeeEditForm = ({ onClose, onSuccess }) => {
@@ -16,11 +17,12 @@ const EmployeeEditForm = ({ onClose, onSuccess }) => {
   const [mobile, setMobile] = useState("");
   const [password, setPassword] = useState("");
 
+
   const employee = location.state?.employee || null;
 
   const [errors, setErrors] = useState({});
   const [showPassword, setShowPassword] = useState(false);
-  const [updateEmployee, { isLoading }] = useUpdateEmployeeMutation();
+  const [updateEmployee, { isLoading, isError, error }] = useUpdateEmployeeMutation();
   const [successMessage, setSuccessMessage] = useState("");
 
   // Pre-populate fields when employee data is available
@@ -67,6 +69,21 @@ const EmployeeEditForm = ({ onClose, onSuccess }) => {
     if (errors.password) {
       setErrors((prev) => ({ ...prev, password: "" }));
     }
+
+    const value = e.target.value;
+    if (value && !validatePasswordStrength(value)) {
+      setErrors((prev) => ({
+        ...prev,
+        password:
+          "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character",
+      }));
+    }
+  };
+
+  const validatePasswordStrength = (password) => {
+    const regex =
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+    return regex.test(password);
   };
 
   const validateForm = () => {
@@ -94,15 +111,15 @@ const EmployeeEditForm = ({ onClose, onSuccess }) => {
 
     if (!password.trim()) {
       newErrors.password = "Password is required";
-    } else if (password.length < 6) {
-      newErrors.password = "Password must be at least 6 characters long";
+    } else if (!validatePasswordStrength(password)) {
+      newErrors.password =
+        "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character";
     }
-
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-    const handleSubmit = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!validateForm()) {
@@ -135,17 +152,14 @@ const EmployeeEditForm = ({ onClose, onSuccess }) => {
 
       // ✅ Navigate back to employees table after 2 seconds
       setTimeout(() => {
-        navigate('/employees'); // or navigate(-1) to go to previous page
+        navigate("/employees"); // or navigate(-1) to go to previous page
         onClose?.();
       }, 2000);
 
       onSuccess?.("Employee updated successfully!");
     } catch (error) {
       console.error("Failed to update employee:", error);
-      setErrors({
-        submit:
-          error.data?.message || "Failed to update employee. Please try again.",
-      });
+      
     }
   };
 
@@ -170,6 +184,16 @@ const EmployeeEditForm = ({ onClose, onSuccess }) => {
         <h2 className="text-2xl font-bold text-gray-800 mb-2">Edit Employee</h2>
         <p className="text-gray-600">Update employee information</p>
       </div>
+
+      {/* ✅ Success Message */}
+      {successMessage && (
+        <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-4">
+          <p className="text-green-600 text-sm font-medium">{successMessage}</p>
+        </div>
+      )}
+
+      {/* ✅ RTK Query Error Display */}
+     
 
       {/* Form */}
       <form onSubmit={handleSubmit} className="space-y-5">
@@ -234,6 +258,8 @@ const EmployeeEditForm = ({ onClose, onSuccess }) => {
           placeholder="Enter password"
         />
 
+        
+
         {/* Submit Error */}
         {errors.submit && (
           <div className="bg-red-50 border border-red-200 rounded-lg p-4">
@@ -267,6 +293,12 @@ const EmployeeEditForm = ({ onClose, onSuccess }) => {
           </button>
         </div>
       </form>
+
+      {/* Error Popup - Only shows when isError is true */}
+      <ErrorPopup 
+        isError={isError} 
+        error={error} 
+      />
     </div>
   );
 };
