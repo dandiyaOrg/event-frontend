@@ -1,16 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import InputField from '../Components/InputField';
-import { 
-  Calendar, 
-  MapPin, 
-  Globe, 
-  FileText, 
-  StickyNote, 
-  Upload,
-  Tag,
-  User
-} from 'lucide-react';
 
 const EventDetailForm = ({ onClose, onSuccess }) => {
   const navigate = useNavigate();

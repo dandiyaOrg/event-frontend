@@ -63,15 +63,14 @@ const router = createBrowserRouter(
       >
         <Route index element={<Dashboard />} />
         {/* Main Events (parent list & detail) */}
-  <Route path="/events" element={<Events />} />
-  <Route path="/events/:eventId" element={<EventDetails />} />
+        <Route path="/events" element={<Events />} />
+        <Route path="/events/:eventId" element={<EventDetails />} />
 
 
-  {/* Sub-event Management (nested under eventId) */}
-  <Route path="/events/:eventId/sub-events" element={<SubEvent />} />
-  <Route path="/events/:eventId/sub-events/new" element={<SubEventForm />} />               // Add new subevent
-  <Route path="/events/:eventId/sub-events/:subEventId" element={<SubEventDetails />} />    // View subevent details
-  {/* <Route path="/events/:eventId/sub-events/:subEventId/edit" element={<SubEventEdit />} /> // Edit subevent */}
+        {/* Sub-event Management (nested under eventId) */}
+        <Route path="/events/:eventId/subevents" element={<SubEvent />} />
+        <Route path="/events/:eventId/subevents/new" element={<SubEventForm />} />
+        <Route path="/events/:eventId/subevents/:subEventId" element={<SubEventDetails />} />
 
         {/* Employee Routes */}
         <Route path="/employees" element={<Employees />} />

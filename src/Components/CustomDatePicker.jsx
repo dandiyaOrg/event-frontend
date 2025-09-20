@@ -37,17 +37,38 @@ function getMonthMatrix(year, month) {
 }
 
 const months = [
-  "January", "February", "March", "April", "May", "June",
-  "July", "August", "September", "October", "November", "December"
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
 ];
 
-export default function CustomDatePicker() {
+export default function CustomDatePicker({
+  minDate = null,
+  maxDate = null,
+  disabledDates = [], // Array of specific dates to disable
+  placeholder = "Select date",
+  onChange = null,
+  value = null,
+}) {
   const [open, setOpen] = useState(false);
-  const [selectedDate, setSelectedDate] = useState(null);
+  const [selectedDate, setSelectedDate] = useState(value);
 
   const today = new Date();
-  const [month, setMonth] = useState(today.getMonth());
-  const [year, setYear] = useState(today.getFullYear());
+  const [month, setMonth] = useState(
+    selectedDate ? selectedDate.getMonth() : today.getMonth()
+  );
+  const [year, setYear] = useState(
+    selectedDate ? selectedDate.getFullYear() : today.getFullYear()
+  );
 
   const inputRef = useRef();
 
@@ -60,28 +81,78 @@ export default function CustomDatePicker() {
     return () => document.removeEventListener("mousedown", handleClick);
   }, [open]);
 
+  // ✅ Function to check if a date is disabled
+  const isDateDisabled = (date) => {
+    // Check min/max date limits
+    if (minDate && date < minDate) return true;
+    if (maxDate && date > maxDate) return true;
+
+    // Check specific disabled dates
+    if (disabledDates.length > 0) {
+      return disabledDates.some((disabledDate) => {
+        const disabled = new Date(disabledDate);
+        return date.toDateString() === disabled.toDateString();
+      });
+    }
+
+    return false;
+  };
+
+  // ✅ Function to check if month navigation should be disabled
+  const isMonthNavigationDisabled = (direction) => {
+    const testDate = new Date(year, month + direction, 15); // 15th of the month
+
+    if (direction < 0 && minDate) {
+      return testDate < new Date(minDate.getFullYear(), minDate.getMonth(), 1);
+    }
+    if (direction > 0 && maxDate) {
+      return (
+        testDate > new Date(maxDate.getFullYear(), maxDate.getMonth() + 1, 0)
+      );
+    }
+    return false;
+  };
+
   const handleDateSelect = (dayObj) => {
-    if (dayObj.otherMonth) return; // Ignore clicks on other months (optional)
-    const d = new Date(year, month, dayObj.day);
-    setSelectedDate(d);
+    if (dayObj.otherMonth) return; // Ignore clicks on other months
+
+    const selectedDateObj = new Date(year, month, dayObj.day);
+
+    // ✅ Check if the date is disabled
+    if (isDateDisabled(selectedDateObj)) {
+      return; // Don't allow selection of disabled dates
+    }
+
+    setSelectedDate(selectedDateObj);
+
+    // ✅ Call onChange callback if provided
+    if (onChange) {
+      onChange(selectedDateObj);
+    }
+
     setOpen(false);
   };
 
   // Month navigation
   const prevMonth = () => {
+    if (isMonthNavigationDisabled(-1)) return;
+
     if (month === 0) {
       setMonth(11);
-      setYear(y => y - 1);
+      setYear((y) => y - 1);
     } else {
-      setMonth(m => m - 1);
+      setMonth((m) => m - 1);
     }
   };
+
   const nextMonth = () => {
+    if (isMonthNavigationDisabled(1)) return;
+
     if (month === 11) {
       setMonth(0);
-      setYear(y => y + 1);
+      setYear((y) => y + 1);
     } else {
-      setMonth(m => m + 1);
+      setMonth((m) => m + 1);
     }
   };
 
@@ -91,19 +162,19 @@ export default function CustomDatePicker() {
     <div ref={inputRef} className="relative max-w-xs">
       <div className="relative">
         <span className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-          <svg className="w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-            <path d="M20 4a2 2 0 0 0-2-2h-2V1a1 1 0 0 0-2 0v1h-3V1a1 1 0 0 0-2 0v1H6V1a1 1 0 0 0-2 0v1H2a2 2 0 0 0-2 2v2h20V4ZM0 18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8H0v10Zm5-8h10a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2Z"/>
+          <svg
+            className="w-5 h-5 text-gray-400"
+            fill="currentColor"
+            viewBox="0 0 20 20"
+          >
+            <path d="M20 4a2 2 0 0 0-2-2h-2V1a1 1 0 0 0-2 0v1h-3V1a1 1 0 0 0-2 0v1H6V1a1 1 0 0 0-2 0v1H2a2 2 0 0 0-2 2v2h20V4ZM0 18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8H0v10Zm5-8h10a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2Z" />
           </svg>
         </span>
         <input
           type="text"
           readOnly
-          value={
-            selectedDate
-              ? selectedDate.toLocaleDateString("en-GB")
-              : ""
-          }
-          placeholder="Select date"
+          value={selectedDate ? selectedDate.toLocaleDateString("en-GB") : ""}
+          placeholder={placeholder}
           onClick={() => setOpen(!open)}
           className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 p-2.5 cursor-pointer outline-none"
         />
@@ -112,46 +183,74 @@ export default function CustomDatePicker() {
         <div className="absolute left-0 mt-2 w-80 bg-white rounded-xl shadow-lg z-10 p-4">
           <div className="flex items-center justify-between mb-2">
             <button
-              className="px-3 text-2xl font-bold text-gray-500 hover:text-black"
+              className={`px-3 text-2xl font-bold transition ${
+                isMonthNavigationDisabled(-1)
+                  ? "text-gray-300 cursor-not-allowed"
+                  : "text-gray-500 hover:text-black"
+              }`}
               onClick={prevMonth}
-            >&lt;</button>
+              disabled={isMonthNavigationDisabled(-1)}
+            >
+              &lt;
+            </button>
             <span className="font-semibold text-gray-900 text-lg">
               {months[month]} {year}
             </span>
             <button
-              className="px-3 text-2xl font-bold text-gray-500 hover:text-black"
+              className={`px-3 text-2xl font-bold transition ${
+                isMonthNavigationDisabled(1)
+                  ? "text-gray-300 cursor-not-allowed"
+                  : "text-gray-500 hover:text-black"
+              }`}
               onClick={nextMonth}
-            >&gt;</button>
+              disabled={isMonthNavigationDisabled(1)}
+            >
+              &gt;
+            </button>
           </div>
+
           <div>
             <div className="flex justify-between mb-1 text-gray-500 font-semibold text-sm">
-              {["Su","Mo","Tu","We","Th","Fr","Sa"].map((d) => (
-                <div key={d} className="w-9 text-center">{d}</div>
+              {["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"].map((d) => (
+                <div key={d} className="w-9 text-center">
+                  {d}
+                </div>
               ))}
             </div>
             {matrix.map((week, i) => (
-              <div key={i} className="flex">
-                {week.map((d, j) => (
-                  <div key={j} className="w-9 h-9 flex items-center justify-center">
-                    <button
-                      type="button"
-                      className={`rounded-full w-8 h-8 text-sm transition
-                        ${d.otherMonth
-                          ? "text-gray-300"
-                          : selectedDate &&
-                            selectedDate.getFullYear() === year &&
-                            selectedDate.getMonth() === month &&
-                            selectedDate.getDate() === d.day
-                          ? "bg-blue-600 text-white font-bold"
-                          : "hover:bg-blue-100 text-gray-900"
-                        }`}
-                      onClick={() => handleDateSelect(d)}
-                      disabled={d.otherMonth}
-                    >
-                      {d.day}
-                    </button>
-                  </div>
-                ))}
+              <div key={i} className="flex gap-2.5">
+                {week.map((d, j) => {
+                  const currentDate = new Date(year, month, d.day);
+                  const isDisabled =
+                    !d.otherMonth && isDateDisabled(currentDate);
+                  const isSelected =
+                    selectedDate &&
+                    selectedDate.getFullYear() === year &&
+                    selectedDate.getMonth() === month &&
+                    selectedDate.getDate() === d.day;
+
+                  return (
+                    <div key={j} className="w-9 h-9 flex items-center">
+                      <button
+                        type="button"
+                        className={`rounded-full w-8 h-8 text-sm transition
+                          ${
+                            d.otherMonth
+                              ? "text-gray-300 cursor-default"
+                              : isDisabled
+                              ? "text-gray-300 cursor-not-allowed bg-gray-100"
+                              : isSelected
+                              ? "bg-blue-600 text-white font-bold"
+                              : "hover:bg-blue-100 text-gray-900"
+                          }`}
+                        onClick={() => handleDateSelect(d)}
+                        disabled={d.otherMonth || isDisabled}
+                      >
+                        {d.day}
+                      </button>
+                    </div>
+                  );
+                })}
               </div>
             ))}
           </div>

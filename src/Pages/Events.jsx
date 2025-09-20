@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import EventCard from '../Components/EventCard';  
-import SearchBar from '../Components/SearchBar';
+import { useGetEventsQuery } from '../features/events/eventsApi';
 
 //Import mockData safely
 import mockData from '../Data/MockData.json';
@@ -11,7 +11,9 @@ function Events() {
   const [searchTerm, setSearchTerm] = useState('');
 
   // Get events with safety checks
-  const events = mockData?.events || [];
+  const { data, error, isLoading } = useGetEventsQuery();
+  console.log("Events Data:", data);
+  const events = data?.data || [];
   
   //Simple search filter
   const filteredEvents = events.filter(event => {
@@ -59,7 +61,7 @@ function Events() {
       <div className="space-y-6">
         {filteredEvents.length > 0 ? (
           filteredEvents.map(event => (
-            <EventCard key={event.id} event={event} />
+            <EventCard key={event.event_id} event={event} />
           ))
         ) : (
           <div className="text-center py-12 bg-white rounded-lg">

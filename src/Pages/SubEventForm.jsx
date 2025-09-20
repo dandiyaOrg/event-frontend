@@ -1,15 +1,102 @@
-import React from "react";
+import React, { useState } from "react";
 import InputField from "../Components/InputField";
 import CustomDatePicker from "../Components/CustomDatePicker";
 import { TimePicker } from "../Components/TimePicker";
-import { useNavigate } from "react-router-dom";
-
-
+import { useNavigate, useParams } from "react-router-dom";
+import { useCreateSubeventMutation } from "../features/events/eventsApi";
 
 function App() {
+  
+  const navigate = useNavigate();
+  const [errors, setErrors] = useState({});
+  const { eventId } = useParams();
+  const [createSubevent, { isLoading, isSuccess, isError, error }] = useCreateSubeventMutation();
 
-  const [eventName, setEventName] = React.useState("");
-    const navigate=useNavigate();
+  const [eventDate, setEventDate] = useState(null);
+  const eventStart = new Date("2025-09-23");
+  const eventEnd = new Date("2025-10-01");
+  
+  const [formData, setFormData] = useState({
+      name: '',
+      event_id: eventId,
+      date: '',
+      start_time: '',
+      end_time: '',
+      day: '',
+      quantity: '',
+      description: '',
+  });
+  const [image, setImage] = useState(null);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prevData => ({
+      ...prevData,
+      [name]: value
+    }));
+    
+    // Clear error when user starts typing
+    if (errors[name]) {
+      setErrors(prevData => ({
+        ...prevData,
+        [name]: ''
+      }));
+    }
+  };
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setImage(file);
+      
+      // Create preview URL
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const validateForm = () => {
+    const newErrors = {};
+
+
+
+    return newErrors;
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    
+    const validationErrors = validateForm();
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
+      return;
+    }
+    
+    try {
+      await createSubevent(formData).unwrap();
+      // Success - redirect to employees list
+      navigate('/employees', { 
+        state: { 
+          message: `Employee ${formData.name} has been added successfully!` 
+        }
+      });
+    } catch (error) {
+      console.error("Failed to create sub-event:", error);
+      
+      // Handle API errors
+      if (error?.data?.message) {
+        setErrors({ submit: error.data.message });
+      } else if (error?.data?.errors) {
+        // Handle validation errors from backend
+        setErrors(error.data.errors);
+      } else {
+        setErrors({ submit: 'Failed to add employee. Please try again.' });
+      }
+    } 
+  };
+
   return (
     <div className=" p-6 bg-gray-100 rounded-lg shadow-md">
       <h2 className="text-3xl font-semibold mb-6 text-gray-800">Create New Sub Event</h2>
@@ -18,27 +105,25 @@ function App() {
         
         {/* Event Name */}
         <InputField
-        label="Sub Event Name"
-        id="event-name"
-        placeholder="Enter Sub event name"
-        value={eventName}
-        onChange={(e) => setEventName(e.target.value)}
+          label="Sub Event Name"
+          id="event-name"
+          placeholder="Enter Sub event name"
+          value={formData.name}
+          onChange={(e) => {}}
           width="w-1/2"
-
-      />
+        />
         
-        {/* Dates & Number of Days */}
-        <CustomDatePicker/>
-
+        <CustomDatePicker
+          minDate={eventStart}
+          maxDate={eventEnd}
+          value={eventDate}
+          onChange={setEventDate}
+          placeholder="select event date"
+        />
 
         {/* Time Picker  */}
         <TimePicker/>
 
-
-
-
-
-     
         {/* Upload Image */}
         <div className="flex items-center gap-4">
           <label
@@ -52,7 +137,7 @@ function App() {
             id="upload-image"
             className="hidden"
           />
-          <span className="text-gray-500 text-sm italic">No file chosen</span> {/* You can update this dynamically */}
+          <span className="text-gray-500 text-sm italic">No file chosen</span>
         </div>
 
         {/* Venue */}
@@ -64,7 +149,6 @@ function App() {
           value=""
           onChange={() => {}}
           width="w-1/2"
-         className=""
         />
 
        
@@ -78,7 +162,6 @@ function App() {
           isTextarea={true}
           rows={5}
           width=""
-         className=""
         />
 
        
@@ -86,12 +169,12 @@ function App() {
         {/* Buttons */}
         <div className="flex justify-end gap-4 pt-4">
           <button
-  type="button"
-  onClick={() => navigate(-1)}
-  className="px-4 py-2 border border-gray-400 rounded-md text-gray-700 hover:bg-gray-300 transition"
->
-  Cancel
-</button>
+            type="button"
+            onClick={(e) => navigate(-1)}
+            className="px-4 py-2 border border-gray-400 rounded-md text-gray-700 hover:bg-gray-300 transition"
+          >
+            Cancel
+          </button>
 
           <button
             type="submit"

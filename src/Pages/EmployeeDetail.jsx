@@ -37,7 +37,7 @@ const EmployeeDetail = () => {
   const [employee, setEmployee] = useState(location.state?.employee || null);
   
   // RTK Query mutations
-  const [deleteEmployee, { isLoading: isDeleting, isError,error}] = useDeleteEmployeeMutation();
+  const [deleteEmployee, { isLoading, isDeleting, isError,error}] = useDeleteEmployeeMutation();
   const [toggleStatus, { isLoading: isToggling, isError: isToggleError, error: toggleError }] = useToggleStatusMutation();
 
   console.log("Employee Detail:", employee);

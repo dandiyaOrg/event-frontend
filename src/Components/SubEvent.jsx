@@ -3,13 +3,17 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Plus, Search, Calendar, Users } from 'lucide-react';
 import mockData from "../Data/MockData.json";
 import SubEventCard from './SubEventCard';
+import { useGetSubeventsByEventIdQuery } from '../features/events/eventsApi';
 
 const { SubEvents } = mockData;
 
 const SubEvent = () => {
-  const { eventId } = useParams(); // Get eventId from URL
+  const { eventId } = useParams(); 
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
+
+  const { data, error, isLoading } = useGetSubeventsByEventIdQuery(eventId);
+  console.log("Fetched SubEvents Data:", data);
 
   // Filter sub-events by eventId
   const eventSubEvents = SubEvents.filter(subEvent => 
@@ -25,17 +29,17 @@ const SubEvent = () => {
 
   // Handler functions
   const handleAddNewSubEvent = () => {
-    navigate(`/events/${eventId}/sub-events/new`);
+    navigate(`/events/${eventId}/subevents/new`);
   };
 
   const handleView = (subEvent) => {
-    navigate(`/events/${eventId}/sub-events/${subEvent.id}`, {
+    navigate(`/events/${eventId}/subevents/${subEvent.id}`, {
       state: { subEvent }
     });
   };
 
   const handleEdit = (subEvent) => {
-    navigate(`/events/${eventId}/sub-events/${subEvent.id}/edit`, {
+    navigate(`/events/${eventId}/subevents/${subEvent.id}/edit`, {
       state: { subEvent }
     });
   };
