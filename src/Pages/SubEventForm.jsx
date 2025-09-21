@@ -1,15 +1,15 @@
 import React, { useState } from "react";
-import { 
-  Calendar, 
-  Clock, 
-  Hash, 
-  Users, 
-  FileText, 
+import {
+  Calendar,
+  Clock,
+  Hash,
+  Users,
+  FileText,
   Image as ImageIcon,
   MapPin,
   Tag,
-  User
-} from 'lucide-react';
+  User,
+} from "lucide-react";
 import InputField from "../Components/InputField";
 import CustomDatePicker from "../Components/CustomDatePicker";
 import { TimePicker } from "../Components/TimePicker";
@@ -20,38 +20,39 @@ function App() {
   const navigate = useNavigate();
   const [errors, setErrors] = useState({});
   const { eventId } = useParams();
-  const [createSubevent, { isLoading, isSuccess, isError, error }] = useCreateSubeventMutation();
+  const [createSubevent, { isLoading, isSuccess, isError, error }] =
+    useCreateSubeventMutation();
 
   const [eventDate, setEventDate] = useState(null);
   const eventStart = new Date("2025-09-23");
   const eventEnd = new Date("2025-10-01");
-  
+
   const [formData, setFormData] = useState({
-    name: '',
-    event_id: eventId || '',
-    date: '',
-    start_time: '',
-    end_time: '',
-    day: '',
-    quantity: '',
-    description: '',
+    name: "",
+    event_id: eventId || "",
+    date: "",
+    start_time: "",
+    end_time: "",
+    day: "",
+    quantity: "",
+    description: "",
   });
-  
+
   const [image, setImage] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prevData => ({
+    setFormData((prevData) => ({
       ...prevData,
-      [name]: value
+      [name]: value,
     }));
-    
+
     // Clear error when user starts typing
     if (errors[name]) {
-      setErrors(prevData => ({
+      setErrors((prevData) => ({
         ...prevData,
-        [name]: ''
+        [name]: "",
       }));
     }
   };
@@ -60,7 +61,7 @@ function App() {
     const file = e.target.files[0];
     if (file) {
       setImage(file);
-      
+
       // Create preview URL
       const reader = new FileReader();
       reader.onloadend = () => {
@@ -73,17 +74,19 @@ function App() {
   const handleDateChange = (selectedDate) => {
     setEventDate(selectedDate);
     // Format date for form data (YYYY-MM-DD)
-    const formattedDate = selectedDate ? selectedDate.toISOString().split('T')[0] : '';
-    setFormData(prevData => ({
+    const formattedDate = selectedDate
+      ? selectedDate.toISOString().split("T")[0]
+      : "";
+    setFormData((prevData) => ({
       ...prevData,
-      date: formattedDate
+      date: formattedDate,
     }));
   };
 
   const handleTimeChange = (timeType, timeValue) => {
-    setFormData(prevData => ({
+    setFormData((prevData) => ({
       ...prevData,
-      [timeType]: timeValue
+      [timeType]: timeValue,
     }));
   };
 
@@ -92,41 +95,41 @@ function App() {
 
     // Required field validations
     if (!formData.name.trim()) {
-      newErrors.name = 'Sub Event Name is required';
+      newErrors.name = "Sub Event Name is required";
     }
 
     if (!formData.event_id) {
-      newErrors.event_id = 'Event ID is required';
+      newErrors.event_id = "Event ID is required";
     }
 
     if (!formData.date) {
-      newErrors.date = 'Date is required';
+      newErrors.date = "Date is required";
     }
 
     if (!formData.start_time) {
-      newErrors.start_time = 'Start time is required';
+      newErrors.start_time = "Start time is required";
     }
 
     if (!formData.end_time) {
-      newErrors.end_time = 'End time is required';
+      newErrors.end_time = "End time is required";
     }
 
     if (!formData.day) {
-      newErrors.day = 'Day is required';
+      newErrors.day = "Day is required";
     }
 
     if (!formData.quantity) {
-      newErrors.quantity = 'Quantity is required';
+      newErrors.quantity = "Quantity is required";
     } else if (parseInt(formData.quantity) <= 0) {
-      newErrors.quantity = 'Quantity must be greater than 0';
+      newErrors.quantity = "Quantity must be greater than 0";
     }
 
     if (!formData.description.trim()) {
-      newErrors.description = 'Description is required';
+      newErrors.description = "Description is required";
     }
 
     if (!image) {
-      newErrors.image = 'Sub Event Image is required';
+      newErrors.image = "Sub Event Image is required";
     }
 
     // Time validation
@@ -134,7 +137,7 @@ function App() {
       const startTime = new Date(`2000-01-01T${formData.start_time}`);
       const endTime = new Date(`2000-01-01T${formData.end_time}`);
       if (startTime >= endTime) {
-        newErrors.end_time = 'End time must be after start time';
+        newErrors.end_time = "End time must be after start time";
       }
     }
 
@@ -143,54 +146,52 @@ function App() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     const validationErrors = validateForm();
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
       return;
     }
-    
+
     try {
       // Create FormData for file upload
       const submitData = new FormData();
-      
+
       // Append all form fields
-      Object.keys(formData).forEach(key => {
+      Object.keys(formData).forEach((key) => {
         submitData.append(key, formData[key]);
       });
-      
+
       // Append image file
       if (image) {
-        submitData.append('image', image);
+        submitData.append("image", image);
       }
 
       await createSubevent(submitData).unwrap();
-      
+
       // Success - redirect to events list
-      navigate(`/events/${eventId}`, { 
-        state: { 
-          message: `Sub-event ${formData.name} has been created successfully!` 
-        }
+      navigate(`/events/${eventId}`, {
+        state: {
+          message: `Sub-event ${formData.name} has been created successfully!`,
+        },
       });
     } catch (error) {
       console.error("Failed to create sub-event:", error);
-      
+
       // Handle API errors
       if (error?.data?.message) {
         setErrors({ submit: error.data.message });
       } else if (error?.data?.errors) {
         setErrors(error.data.errors);
       } else {
-        setErrors({ submit: 'Failed to create sub-event. Please try again.' });
+        setErrors({ submit: "Failed to create sub-event. Please try again." });
       }
-    } 
+    }
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 p-6">
       <div className="max-w-4xl mx-auto">
-        
-
         {/* Form Container */}
         <div className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
           {/* Display submit error if exists */}
@@ -198,19 +199,22 @@ function App() {
             <div className="bg-red-50 border-l-4 border-red-400 p-4 m-6 rounded-lg">
               <div className="flex items-center">
                 <div className="ml-3">
-                  <p className="text-sm text-red-800 font-medium">{errors.submit}</p>
+                  <p className="text-sm text-red-800 font-medium">
+                    {errors.submit}
+                  </p>
                 </div>
               </div>
             </div>
           )}
-          
+
           <form onSubmit={handleSubmit} className="p-8 space-y-8">
-            
             {/* Basic Information Section */}
             <div className="space-y-6">
               <div className="flex items-center space-x-2 pb-4 border-b border-gray-200">
                 <User className="w-5 h-5 text-blue-500" />
-                <h3 className="text-lg font-semibold text-gray-800">Basic Information</h3>
+                <h3 className="text-lg font-semibold text-gray-800">
+                  Basic Information
+                </h3>
               </div>
 
               {/* Sub Event Name */}
@@ -226,15 +230,15 @@ function App() {
                 variant="filled"
                 helperText="Give your sub-event a memorable name"
               />
-
-            
             </div>
 
             {/* Date & Time Section */}
             <div className="space-y-6">
               <div className="flex items-center space-x-2 pb-4 border-b border-gray-200">
                 <Calendar className="w-5 h-5 text-blue-500" />
-                <h3 className="text-lg font-semibold text-gray-800">Date & Time</h3>
+                <h3 className="text-lg font-semibold text-gray-800">
+                  Date & Time
+                </h3>
               </div>
 
               {/* Date Picker */}
@@ -243,7 +247,6 @@ function App() {
                   Event Date <span className="text-red-500">*</span>
                 </label>
                 <div className="relative">
-                 
                   <CustomDatePicker
                     minDate={eventStart}
                     maxDate={eventEnd}
@@ -267,34 +270,36 @@ function App() {
                     Start Time <span className="text-red-500">*</span>
                   </label>
                   <div className="relative">
-                    
                     <TimePicker
                       value={formData.start_time}
-                      onChange={(time) => handleTimeChange('start_time', time)}
+                      onChange={(time) => handleTimeChange("start_time", time)}
                       placeholder="Select start time"
                       className="w-1/2"
                     />
                   </div>
                   {errors.start_time && (
-                    <p className="text-red-500 text-sm mt-1">{errors.start_time}</p>
+                    <p className="text-red-500 text-sm mt-1">
+                      {errors.start_time}
+                    </p>
                   )}
                 </div>
-                
+
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">
                     End Time <span className="text-red-500">*</span>
                   </label>
                   <div className="relative">
-                   
                     <TimePicker
                       value={formData.end_time}
-                      onChange={(time) => handleTimeChange('end_time', time)}
+                      onChange={(time) => handleTimeChange("end_time", time)}
                       placeholder="Select end time"
                       className="w-1/2"
                     />
                   </div>
                   {errors.end_time && (
-                    <p className="text-red-500 text-sm mt-1">{errors.end_time}</p>
+                    <p className="text-red-500 text-sm mt-1">
+                      {errors.end_time}
+                    </p>
                   )}
                 </div>
               </div>
@@ -304,7 +309,9 @@ function App() {
             <div className="space-y-6">
               <div className="flex items-center space-x-2 pb-4 border-b border-gray-200">
                 <FileText className="w-5 h-5 text-blue-500" />
-                <h3 className="text-lg font-semibold text-gray-800">Event Details</h3>
+                <h3 className="text-lg font-semibold text-gray-800">
+                  Event Details
+                </h3>
               </div>
 
               {/* Day and Quantity */}
@@ -315,15 +322,15 @@ function App() {
                   type="number"
                   icon={Hash}
                   placeholder="Enter day number (e.g., 1, 2, 3)"
-                  value={1}
-                  handleChange={()=>{}}
+                  value={formData.day} // bind to state
+                  handleChange={handleChange} // update on change
                   errors={errors}
                   required={true}
                   min="1"
                   variant="filled"
                   helperText="Which day of the event"
                 />
-                
+
                 <InputField
                   label="Quantity/Capacity"
                   name="quantity"
@@ -391,11 +398,11 @@ function App() {
                         onChange={handleImageChange}
                       />
                       <p className="text-sm text-gray-500 mt-2">
-                        {image ? image.name : 'PNG, JPG, JPEG up to 10MB'}
+                        {image ? image.name : "PNG, JPG, JPEG up to 10MB"}
                       </p>
                     </div>
                   </div>
-                  
+
                   {/* Image Preview */}
                   {imagePreview && (
                     <div className="mt-6 flex justify-center">
