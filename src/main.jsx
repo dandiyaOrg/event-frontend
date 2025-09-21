@@ -21,12 +21,14 @@ import SubEvent from "./Components/SubEvent.jsx";
 import SubEventForm from "./Pages/SubEventForm";
 import SubEventDetails from "./Pages/SubEventDetail";
 import SubEventEditFrom from "./Pages/SubEventEditFrom.jsx";
+import PassTable from "./Components/PassTable.jsx";
+import PassCreateForm from "./Pages/PassCreateForm.jsx";
 import Employees from "./Pages/Employees";
-import EmployeeDetail from "./Pages/EmployeeDetail.jsx"
-import EmployeeDetailForm from "./Pages/EmployeeDetailForm"
+import EmployeeDetail from "./Pages/EmployeeDetail.jsx";
+import EmployeeDetailForm from "./Pages/EmployeeDetailForm";
 import EmployeeEditForm from "./Pages/EmployeeEditForm.jsx";
 import Transactions from "./Pages/Transactions";
-import TransactionDetail from "./Pages/TransactionDetail.jsx"
+import TransactionDetail from "./Pages/TransactionDetail.jsx";
 import Profile from "./Pages/Profile";
 import SignUp from "./Pages/SignUp";
 import BillingUser from "./Pages/BillingUser";
@@ -67,28 +69,46 @@ const router = createBrowserRouter(
         <Route path="/events" element={<Events />} />
         <Route path="/events/:eventId" element={<EventDetails />} />
 
-
         {/* Sub-event Management (nested under eventId) */}
         <Route path="/events/:eventId/subevents" element={<SubEvent />} />
-        <Route path="/events/:eventId/subevents/new" element={<SubEventForm />} />
-        <Route path="/events/:eventId/subevents/:subEventId" element={<SubEventDetails />} />
-        <Route 
-          path="/events/:eventId/subevents/:subEventId/edit" 
-          element={<SubEventEditFrom />} 
+        <Route
+          path="/events/:eventId/subevents/new"
+          element={<SubEventForm />}
+        />
+        <Route
+          path="/events/:eventId/subevents/:subEventId"
+          element={<SubEventDetails />}
+        />
+        <Route
+          path="/events/:eventId/subevents/:subEventId/edit"
+          element={<SubEventEditFrom />}
         />
 
-
+        {/* Pass Management (nested under subEventId) */}
+        <Route
+          path="/events/:eventId/subevents/:subEventId/passes"
+          element={<PassTable />}
+        />
+        <Route
+          path="/events/:eventId/subevents/:subEventId/passes/create"
+          element={<PassCreateForm />}
+        />
 
         {/* Employee Routes */}
         <Route path="/employees" element={<Employees />} />
         <Route path="/employees/new" element={<EmployeeDetailForm />} />
         <Route path="/employees/:employeeId" element={<EmployeeDetail />} />
-        <Route path="/employees/:employeeId/edit" element={<EmployeeEditForm />} />
-
+        <Route
+          path="/employees/:employeeId/edit"
+          element={<EmployeeEditForm />}
+        />
 
         {/* Transaction Routes  */}
         <Route path="/transactions" element={<Transactions />} />
-        <Route path="/transactions/:transactionId" element={<TransactionDetail />} />
+        <Route
+          path="/transactions/:transactionId"
+          element={<TransactionDetail />}
+        />
 
         {/* Billing Users Routes */}
         <Route path="billingUsers" element={<BillingUser />} />

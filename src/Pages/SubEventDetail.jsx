@@ -24,6 +24,7 @@ import {
   Image as ImageIcon
 } from 'lucide-react';
 import { useGetSubEventByIdQuery, useDeleteSubEventMutation } from '../features/subEvents/subEventsApi';
+import PassTable from '../Components/PassTable';
 
 const SubEventDetail = () => {
   const { eventId, subEventId } = useParams();
@@ -307,6 +308,10 @@ const SubEventDetail = () => {
                 </div>
               </div>
             )}
+
+
+            {/* Pass Table  */}
+            <PassTable/>
           </div>
 
           {/* Sidebar */}
@@ -388,6 +393,8 @@ const SubEventDetail = () => {
         </div>
       </div>
     </div>
+  
+
   );
 };
 

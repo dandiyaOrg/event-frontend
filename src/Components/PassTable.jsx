@@ -1,220 +1,296 @@
-import React, { useState } from "react";
-import CustomizableTable from "./CustomizableTable";
-import CreateNewPass from "./CreateNewPass";
-
-const initialPassesData = [
-  {
-    id: 1,
-    name: "VIP Pass",
-    category: "Premium",
-    unitPrice: 1500,
-    discountPercent: 10,
-    finalPrice: 1350,
-    passesSold: 120,
-    description: "Premium access with exclusive benefits",
-    maxCapacity: 200,
-    benefits: "Priority seating, Free refreshments, Meet & greet"
-  },
-  {
-    id: 2,
-    name: "Regular Pass",
-    category: "Standard",
-    unitPrice: 800,
-    discountPercent: 5,
-    finalPrice: 760,
-    passesSold: 340,
-    description: "Standard access to all event areas",
-    maxCapacity: 500,
-    benefits: "General admission, Standard seating"
-  },
-];
-
-const passesColumns = [
-  { key: "name", label: "Name" },
-  { key: "category", label: "Category" },
-  { key: "unitPrice", label: "Unit Price" },
-  { key: "discountPercent", label: "Discount %" },
-  { key: "finalPrice", label: "Final Price" },
-  { key: "passesSold", label: "Passes Sold" },
-];
+// components/PassTable.jsx
+import React, { useState } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import CustomizeableTable from '../Components/CustomizableTable';
+import { useGetAllPassesForSubeventQuery } from '../features/passTable/PassTableApi';
+import { Search, Plus, Filter, Download, Eye, Edit, Trash2, MoreVertical } from 'lucide-react';
 
 const PassTable = () => {
-  const [passesData, setPassesData] = useState(initialPassesData);
-  const [selectedPass, setSelectedPass] = useState(null);
-  const [showCreateModal, setShowCreateModal] = useState(false);
-  const [showEditModal, setShowEditModal] = useState(false);
-  const [editingPass, setEditingPass] = useState(null);
-  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-  const [passToDelete, setPassToDelete] = useState(null);
+  const { eventId, subEventId } = useParams(); // Get both eventId and subEventId from URL params
+  const navigate = useNavigate();
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedPasses, setSelectedPasses] = useState([]);
+  
+  // Fetch passes data
+  const { data, error, isLoading, refetch } = useGetAllPassesForSubeventQuery(subEventId);
 
-  // Handler to open detail popup
-  const handleRowClick = (rowData) => {
-    console.log("Row click handler called with:", rowData);
-    setSelectedPass(rowData);
+  // Pass table columns
+  const passesColumns = [
+    { key: "pass_id", label: "Pass ID" },
+    { key: "category", label: "Category" },
+    { key: "total_price", label: "Unit Price" },  
+    { key: "discount_percentage", label: "Discount %" },
+    { key: "final_price", label: "Final Price" },
+  ];
+
+ const passes = React.useMemo(() => {
+  console.log('Processing passes data:', data);
+  
+  if (!data) {
+    console.log('No data received');
+    return [];
+  }
+  
+  // ✅ FIXED: Handle your specific backend response structure
+  let extractedPasses = [];
+  
+  if (Array.isArray(data)) {
+    extractedPasses = data;
+  } else if (Array.isArray(data.data)) {
+    extractedPasses = data.data;
+  } else if (Array.isArray(data.passes)) {
+    extractedPasses = data.passes;
+  } else if (data.message && Array.isArray(data.message.passes)) {
+    // ✅ This handles your specific case
+    extractedPasses = data.message.passes;
+  } else if (data.success && data.message && Array.isArray(data.message.passes)) {
+    // ✅ Double check for your response structure
+    extractedPasses = data.message.passes;
+  } else {
+    console.log('Unexpected data structure:', data);
+    extractedPasses = [];
+  }
+  
+  console.log('Extracted passes:', extractedPasses);
+  console.log('Number of passes:', extractedPasses.length);
+  
+  return extractedPasses;
+}, [data]);
+
+  // Filter passes based on search term
+  const filteredPasses = passes.filter(pass =>
+    pass.pass_id?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    pass.category?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    pass.total_price?.toString().includes(searchTerm) ||
+    pass.final_price?.toString().includes(searchTerm)
+  );
+
+  // Format data for display
+  const formatPassData = (passes) => {
+    return passes.map(pass => ({
+      ...pass,
+      total_price: pass.total_price ? `₹${pass.total_price}` : 'N/A',
+      final_price: pass.final_price ? `₹${pass.final_price}` : 'N/A',
+      discount_percentage: pass.discount_percentage ? `${pass.discount_percentage}%` : '0%',
+    }));
   };
 
-  // Handler to hide detail popup
-  const closeDetailModal = () => {
-    setSelectedPass(null);
+  // ✅ Navigation handlers
+  const handleCreatePass = () => {
+    // Navigate to create pass form
+    navigate(`/events/${eventId}/subevents/${subEventId}/passes/create`);
   };
 
-  // Handler to open create pass modal
-  const handleCreateNewPass = () => {
-    setShowCreateModal(true);
+  // Action handlers
+  const handleView = (pass) => {
+    console.log('View pass:', pass);
+    // Navigate to pass detail page
+    navigate(`/events/${eventId}/subevents/${subEventId}/passes/${pass.pass_id}`);
   };
 
-  // Handler to close create pass modal
-  const closeCreateModal = () => {
-    setShowCreateModal(false);
-  };
-
-  // Handler to add new pass
-  const handleAddNewPass = (newPass) => {
-    const passWithId = {
-      ...newPass,
-      id: Math.max(...passesData.map(p => p.id), 0) + 1
-    };
-    setPassesData(prevPasses => [...prevPasses, passWithId]);
-    console.log("New pass created:", passWithId);
-  };
-
-  // Handler for edit button
   const handleEdit = (pass) => {
-    setEditingPass(pass);
-    setShowEditModal(true);
+    console.log('Edit pass:', pass);
+    // Navigate to pass edit page
+    navigate(`/events/${eventId}/subevents/${subEventId}/passes/${pass.pass_id}/edit`);
   };
 
-  // Handler to close edit modal
-  const closeEditModal = () => {
-    setShowEditModal(false);
-    setEditingPass(null);
-  };
-
-  // Handler to update pass
-  const handleUpdatePass = (updatedPass) => {
-    setPassesData(prevPasses => 
-      prevPasses.map(pass => 
-        pass.id === updatedPass.id ? updatedPass : pass
-      )
-    );
-    console.log("Pass updated:", updatedPass);
-  };
-
-  // Handler for delete button
   const handleDelete = (pass) => {
-    setPassToDelete(pass);
-    setShowDeleteConfirm(true);
+    console.log('Delete pass:', pass);
+    // Add delete confirmation and API call
+    if (window.confirm(`Are you sure you want to delete pass ${pass.pass_id}?`)) {
+      // Call delete API when you add mutations
+    }
   };
 
-  // Handler to confirm delete
-  const confirmDelete = () => {
-    setPassesData(prevPasses => 
-      prevPasses.filter(pass => pass.id !== passToDelete.id)
+  // Row actions for the table
+  const getRowActions = (pass) => [
+    {
+      icon: <Eye className="w-4 h-4" />,
+      label: 'View Details',
+      onClick: () => handleView(pass),
+      className: 'text-blue-600 hover:bg-blue-50'
+    },
+    {
+      icon: <Edit className="w-4 h-4" />,
+      label: 'Edit Pass',
+      onClick: () => handleEdit(pass),
+      className: 'text-green-600 hover:bg-green-50'
+    },
+    {
+      icon: <Trash2 className="w-4 h-4" />,
+      label: 'Delete Pass',
+      onClick: () => handleDelete(pass),
+      className: 'text-red-600 hover:bg-red-50'
+    }
+  ];
+
+  // Handle loading state
+ if (isLoading) {
+  return (
+    <div className="flex items-center justify-center min-h-96">
+      <div className="text-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+        <p className="text-gray-600">Loading passes...</p>
+        <p className="text-xs text-gray-500 mt-2">SubEvent ID: {subEventId}</p>
+      </div>
+    </div>
+  );
+}
+
+  // Handle error state
+  if (error) {
+    return (
+      <div className="flex items-center justify-center min-h-96">
+        <div className="text-center max-w-md">
+          <div className="text-red-500 mb-4">
+            <MoreVertical className="w-16 h-16 mx-auto" />
+          </div>
+          <h3 className="text-lg font-semibold text-gray-900 mb-2">
+            Error Loading Passes
+          </h3>
+          <p className="text-red-600 mb-4">
+            {error?.data?.message || error?.message || 'Failed to fetch passes. Please try again.'}
+          </p>
+          <button 
+            onClick={() => refetch()} 
+            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg"
+          >
+            Retry
+          </button>
+        </div>
+      </div>
     );
-    setShowDeleteConfirm(false);
-    setPassToDelete(null);
-    console.log("Pass deleted:", passToDelete);
-  };
+  }
 
-  // Handler to cancel delete
-  const cancelDelete = () => {
-    setShowDeleteConfirm(false);
-    setPassToDelete(null);
-  };
+  // Handle empty state
+  if (passes.length === 0) {
+    return (
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+        {/* Header */}
+        <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
+          <div>
+            <h2 className="text-xl font-semibold text-gray-900">Pass Management</h2>
+            <p className="text-sm text-gray-600 mt-1">No passes found for this sub-event</p>
+          </div>
+          <button 
+            onClick={handleCreatePass}
+            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center space-x-2 transition-colors duration-200"
+          >
+            <Plus className="w-4 h-4" />
+            <span>Add Pass</span>
+          </button>
+        </div>
+        
+        {/* Empty state */}
+        <div className="flex items-center justify-center py-12">
+          <div className="text-center">
+            <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <MoreVertical className="w-8 h-8 text-gray-400" />
+            </div>
+            <h3 className="text-lg font-medium text-gray-900 mb-2">No Passes Yet</h3>
+            <p className="text-gray-600 mb-4">Create your first pass to get started</p>
+            <button 
+              onClick={handleCreatePass}
+              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors duration-200"
+            >
+              Create Pass
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div>
-      <CustomizableTable
-        data={passesData}
-        allColumns={passesColumns}
-        rowsPerPageOptions={[5, 10, 25]}
-        onRowClick={handleRowClick}
-        onEdit={handleEdit}
-        onDelete={handleDelete}
-      />
+    <div className="space-y-6">
+      {/* Header Section */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <h2 className="text-2xl font-bold text-gray-900">Pass Management</h2>
+          <p className="text-gray-600 mt-1">
+            {filteredPasses.length} passes found for this sub-event
+          </p>
+        </div>
+        
+        <div className="flex items-center space-x-3">
+          <button className="flex items-center space-x-2 text-gray-700 hover:bg-gray-100 px-3 py-2 rounded-lg transition-colors">
+            <Download className="w-4 h-4" />
+            <span>Export</span>
+          </button>
+          <button 
+            onClick={handleCreatePass}
+            className="flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors"
+          >
+            <Plus className="w-4 h-4" />
+            <span>Add Pass</span>
+          </button>
+        </div>
+      </div>
 
-      {/* Add New Pass Button */}
-      <div className="flex justify-center items-center">
-        <button 
-          onClick={handleCreateNewPass}
-          className="mt-6 px-6 py-3 bg-gray-600 text-white rounded-xl hover:bg-gray-700 transition-all"
-        >
-          + Add New Pass
+      {/* Search and Filter Bar */}
+      <div className="flex flex-col sm:flex-row gap-4">
+        <div className="flex-1 relative">
+          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <Search className="h-5 w-5 text-gray-400" />
+          </div>
+          <input
+            type="text"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            placeholder="Search passes by ID, category, or price..."
+            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          />
+        </div>
+        
+        <button className="flex items-center space-x-2 text-gray-700 hover:bg-gray-100 px-3 py-2 rounded-lg border border-gray-300 transition-colors">
+          <Filter className="w-4 h-4" />
+          <span>Filter</span>
         </button>
       </div>
 
-      {/* Pass Detail Popup */}
-      {selectedPass && (
-        <div className="fixed inset-0 backdrop-blur-sm  bg-opacity-40 flex items-center justify-center z-50">
-          <div className="bg-white rounded-xl p-6 max-w-md w-full shadow-lg relative max-h-[80vh] overflow-y-auto">
-            <button
-              onClick={closeDetailModal}
-              className="absolute top-3 right-3 text-gray-500 hover:text-gray-700 font-bold text-xl"
-            >
-              &times;
-            </button>
-            <h2 className="text-2xl font-semibold mb-4">{selectedPass.name} Details</h2>
-            <div className="space-y-3">
-              <p><strong>Category:</strong> {selectedPass.category}</p>
-              <p><strong>Unit Price:</strong> ₹{selectedPass.unitPrice}</p>
-              <p><strong>Discount %:</strong> {selectedPass.discountPercent}%</p>
-              <p><strong>Final Price:</strong> ₹{selectedPass.finalPrice}</p>
-              <p><strong>Passes Sold:</strong> {selectedPass.passesSold}</p>
-              {selectedPass.maxCapacity && (
-                <p><strong>Max Capacity:</strong> {selectedPass.maxCapacity}</p>
-              )}
-              {selectedPass.description && (
-                <p><strong>Description:</strong> {selectedPass.description}</p>
-              )}
-              {selectedPass.benefits && (
-                <p><strong>Benefits:</strong> {selectedPass.benefits}</p>
-              )}
+      {/* Statistics Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="bg-white rounded-lg p-4 border border-gray-200 shadow-sm">
+          <div className="flex items-center">
+            <div className="p-2 bg-blue-100 rounded-lg">
+              <MoreVertical className="w-5 h-5 text-blue-600" />
+            </div>
+            <div className="ml-3">
+              <p className="text-sm text-gray-600">Total Passes</p>
+              <p className="text-xl font-bold text-gray-900">{passes.length}</p>
             </div>
           </div>
         </div>
-      )}
 
-      {/* Create New Pass Modal */}
-      <CreateNewPass
-        isOpen={showCreateModal}
-        onClose={closeCreateModal}
-        onSubmit={handleAddNewPass}
-      />
-
-      {/* Edit Pass Modal */}
-      <CreateNewPass
-        isOpen={showEditModal}
-        onClose={closeEditModal}
-        onSubmit={handleUpdatePass}
-        editMode={true}
-        initialData={editingPass}
-      />
-
-      {/* Delete Confirmation Modal */}
-      {showDeleteConfirm && (
-        <div className="fixed inset-0 backdrop-blur-sm bg-opacity-40 flex items-center justify-center z-50">
-          <div className="bg-white rounded-xl p-6 max-w-sm w-full shadow-lg relative">
-            <h2 className="text-xl font-semibold mb-4">Confirm Delete</h2>
-            <p className="text-gray-600 mb-6">
-              Are you sure you want to delete "{passToDelete?.name}"? This action cannot be undone.
-            </p>
-            <div className="flex justify-end space-x-3">
-              <button
-                onClick={cancelDelete}
-                className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition-colors"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={confirmDelete}
-                className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
-              >
-                Delete
-              </button>
+        <div className="bg-white rounded-lg p-4 border border-gray-200 shadow-sm">
+          <div className="flex items-center">
+            <div className="p-2 bg-green-100 rounded-lg">
+              <MoreVertical className="w-5 h-5 text-green-600" />
+            </div>
+            <div className="ml-3">
+              <p className="text-sm text-gray-600">Categories</p>
+              <p className="text-xl font-bold text-gray-900">
+                {new Set(passes.map(p => p.category)).size}
+              </p>
             </div>
           </div>
         </div>
-      )}
+
+      
+      </div>
+
+      {/* Customizable Table */}
+      <CustomizeableTable
+        columns={passesColumns}
+        data={formatPassData(filteredPasses)}
+        searchTerm={searchTerm}
+        onSearchChange={setSearchTerm}
+        selectedItems={selectedPasses}
+        onSelectionChange={setSelectedPasses}
+        getRowActions={getRowActions}
+        emptyStateMessage="No passes match your search criteria"
+        className="bg-white rounded-lg shadow-sm"
+      />
     </div>
   );
 };

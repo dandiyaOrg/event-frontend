@@ -156,7 +156,7 @@ function SubEventEditForm() {
 const handleTimeChange = (timeType, timeValue) => {
   console.log("handleTimeChange called with:", timeType, timeValue);
   
-  // Convert HH:MM to HH:MM:SS format for backend
+  // Convert HH:MM to HH:MM:SS format for backend storage
   const formatToHHMMSS = (time) => {
     if (!time) return time;
     
@@ -175,6 +175,7 @@ const handleTimeChange = (timeType, timeValue) => {
   
   const formattedTime = formatToHHMMSS(timeValue);
   
+  // ✅ FIXED: Prevent infinite loops by checking if value actually changed
   setFormData((prevData) => {
     if (prevData[timeType] === formattedTime) {
       return prevData; // Return same object if no change
@@ -193,6 +194,7 @@ const handleTimeChange = (timeType, timeValue) => {
     }));
   }
 };
+
 
 
   const removeExistingImage = (indexToRemove) => {
@@ -249,7 +251,7 @@ const handleTimeChange = (timeType, timeValue) => {
     return newErrors;
   };
 
-  const handleSubmit = async (e) => {
+ const handleSubmit = async (e) => {
   e.preventDefault();
 
   const validationErrors = validateForm();
@@ -259,39 +261,65 @@ const handleTimeChange = (timeType, timeValue) => {
   }
 
   try {
-    // ✅ FIXED: Completely exclude event_id from update data
-    const updateData = {
-      name: formData.name,
-      date: formData.date,
-      start_time: formData.start_time ? (
-        formData.start_time.length === 5 
-          ? `${formData.start_time}:00` 
-          : formData.start_time
-      ) : "",
-      end_time: formData.end_time ? (
-        formData.end_time.length === 5 
-          ? `${formData.end_time}:00` 
-          : formData.end_time
-      ) : "",
-      day: parseInt(formData.day),
-      quantity: parseInt(formData.quantity),
-      description: formData.description,
-    };
-    // ❌ Do NOT include event_id here at all
+    // ✅ FIXED: Only send fields that have actually changed
+    const updateData = {};
+
+    // Compare with original data and only include changed fields
+    if (formData.name !== existingSubEvent.name) {
+      updateData.name = formData.name;
+    }
+    
+    if (formData.date !== existingSubEvent.date) {
+      updateData.date = formData.date;
+    }
+    
+    // For times, ensure HH:MM:SS format
+    const currentStartTime = formData.start_time ? (
+      formData.start_time.length === 5 ? `${formData.start_time}:00` : formData.start_time
+    ) : "";
+    if (currentStartTime !== existingSubEvent.start_time) {
+      updateData.start_time = currentStartTime;
+    }
+    
+    const currentEndTime = formData.end_time ? (
+      formData.end_time.length === 5 ? `${formData.end_time}:00` : formData.end_time
+    ) : "";
+    if (currentEndTime !== existingSubEvent.end_time) {
+      updateData.end_time = currentEndTime;
+    }
+    
+    // Only include day if it has changed
+    if (parseInt(formData.day) !== existingSubEvent.day) {
+      updateData.day = parseInt(formData.day);
+    }
+    
+    if (parseInt(formData.quantity) !== existingSubEvent.quantity) {
+      updateData.quantity = parseInt(formData.quantity);
+    }
+    
+    if (formData.description !== existingSubEvent.description) {
+      updateData.description = formData.description;
+    }
 
     // Add image if new one is selected
     if (image) {
       updateData.image = image;
     }
 
-    console.log("Submitting update data:", updateData); // Debug log
+    // If no changes were made, show message and don't submit
+    if (Object.keys(updateData).length === 0) {
+      setErrors({ submit: "No changes were made to update." });
+      return;
+    }
+
+    console.log("Submitting only changed data:", updateData);
 
     await updateSubEvent({ 
       subeventId: subEventId, 
       subeventData: updateData 
     }).unwrap();
 
-    // Success - redirect back to sub-event detail or list
+    // Success
     navigate(`/events/${eventId}/subevents/${subEventId}`, {
       state: {
         message: `Sub-event "${formData.name}" has been updated successfully!`,
@@ -300,7 +328,6 @@ const handleTimeChange = (timeType, timeValue) => {
   } catch (error) {
     console.error("Failed to update sub-event:", error);
 
-    // Handle API errors
     if (error?.data?.message) {
       setErrors({ submit: error.data.message });
     } else if (error?.data?.errors) {
@@ -315,6 +342,16 @@ const handleTimeChange = (timeType, timeValue) => {
     }
   }
 };
+
+// Add this before your return statement for debugging
+console.log("Debug Info:", {
+  formDataDay: formData.day,
+  existingDay: existingSubEvent?.day,
+  formDataDayType: typeof formData.day,
+  existingDayType: typeof existingSubEvent?.day,
+  areEqual: parseInt(formData.day) === existingSubEvent?.day
+});
+
 
 
   return (
@@ -418,22 +455,22 @@ const handleTimeChange = (timeType, timeValue) => {
                 )}
               </div>
 
-              {/* Time Pickers */}
+
+{/* Time Pickers - FIXED */}
 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
   <div>
     <label className="block text-sm font-semibold text-gray-700 mb-2">
       Start Time <span className="text-red-500">*</span>
     </label>
     <div className="relative">
-      
-    <TimePicker
-          label=""
-          value={formData.start_time || ""}
-           onChange={(time) => handleTimeChange("start_time", time)}
-          placeholder="Select start time"
-          disabled={false}
-          className="w-full"
-        />
+      <TimePicker
+        label=""
+        value={formData.start_time ? formData.start_time.substring(0, 5) : ""} // ✅ Show only HH:MM
+        onChange={(time) => handleTimeChange("start_time", time)}
+        placeholder="Select start time"
+        disabled={isUpdating}
+        className="w-full"
+      />
     </div>
     {errors.start_time && (
       <p className="text-red-500 text-sm mt-1">
@@ -441,7 +478,7 @@ const handleTimeChange = (timeType, timeValue) => {
       </p>
     )}
     <p className="text-xs text-gray-500 mt-1">
-      Current: {formData.start_time || "Not set"}
+      Current: {formData.start_time ? formData.start_time.substring(0, 5) : "Not set"}
     </p>
   </div>
 
@@ -450,14 +487,14 @@ const handleTimeChange = (timeType, timeValue) => {
       End Time <span className="text-red-500">*</span>
     </label>
     <div className="relative">
-     <TimePicker
-          label=""
-          value={formData.end_time || ""}
-          onChange={(time) => handleTimeChange("end_time", time)}
-          placeholder="Select end time"
-          disabled={false}
-          className="w-full"
-        />
+      <TimePicker
+        label=""
+        value={formData.end_time ? formData.end_time.substring(0, 5) : ""} // ✅ Show only HH:MM
+        onChange={(time) => handleTimeChange("end_time", time)}
+        placeholder="Select end time"
+        disabled={isUpdating}
+        className="w-full"
+      />
     </div>
     {errors.end_time && (
       <p className="text-red-500 text-sm mt-1">
@@ -465,10 +502,11 @@ const handleTimeChange = (timeType, timeValue) => {
       </p>
     )}
     <p className="text-xs text-gray-500 mt-1">
-      Current: {formData.end_time || "Not set"}
+      Current: {formData.end_time ? formData.end_time.substring(0, 5) : "Not set"}
     </p>
   </div>
 </div>
+
 
             </div>
 
