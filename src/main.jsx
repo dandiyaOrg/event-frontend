@@ -20,6 +20,7 @@ import EventDetailForm from "./Pages/EventDetailForm";
 import SubEvent from "./Components/SubEvent.jsx";
 import SubEventForm from "./Pages/SubEventForm";
 import SubEventDetails from "./Pages/SubEventDetail";
+import SubEventEditFrom from "./Pages/SubEventEditFrom.jsx";
 import Employees from "./Pages/Employees";
 import EmployeeDetail from "./Pages/EmployeeDetail.jsx"
 import EmployeeDetailForm from "./Pages/EmployeeDetailForm"
@@ -71,6 +72,12 @@ const router = createBrowserRouter(
         <Route path="/events/:eventId/subevents" element={<SubEvent />} />
         <Route path="/events/:eventId/subevents/new" element={<SubEventForm />} />
         <Route path="/events/:eventId/subevents/:subEventId" element={<SubEventDetails />} />
+        <Route 
+          path="/events/:eventId/subevents/:subEventId/edit" 
+          element={<SubEventEditFrom />} 
+        />
+
+
 
         {/* Employee Routes */}
         <Route path="/employees" element={<Employees />} />

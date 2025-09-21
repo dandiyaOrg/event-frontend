@@ -1,114 +1,184 @@
-import React from 'react';
-import { 
-  Calendar, 
-  Clock, 
-  MapPin, 
-  Users, 
+import React from "react";
+import {
+  Calendar,
+  Clock,
+  MapPin,
+  Users,
   Eye,
   Edit3,
-  Trash2
-} from 'lucide-react';
+  Trash2,
+  Image as ImageIcon,
+} from "lucide-react";
 
 const SubEventCard = ({ subevent, onView, onEdit, onDelete }) => {
   const getStatusColor = (status) => {
+    if (subevent.is_active === false) {
+      return "bg-red-100 text-red-800";
+    }
     switch (status?.toLowerCase()) {
-      case 'active':
-      case 'confirmed':
-        return 'bg-green-100 text-green-800';
-      case 'pending':
-        return 'bg-yellow-100 text-yellow-800';
-      case 'cancelled':
-        return 'bg-red-100 text-red-800';
+      case "active":
+      case "confirmed":
+        return "bg-green-100 text-green-800";
+      case "pending":
+        return "bg-yellow-100 text-yellow-800";
+      case "cancelled":
+        return "bg-red-100 text-red-800";
       default:
-        return 'bg-gray-100 text-gray-800';
+        return "bg-blue-100 text-blue-800";
     }
   };
 
+  // Get the first image or use placeholder
+  const getEventImage = () => {
+    if (
+      subevent.images &&
+      Array.isArray(subevent.images) &&
+      subevent.images.length > 0
+    ) {
+      return subevent.images[0];
+    }
+    return null;
+  };
+
+  const eventImage = getEventImage();
+
   return (
-    <div className="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-md transition-shadow duration-200 group">
-      {/* Header */}
-      <div className="flex justify-between items-start mb-4">
-        <div className="flex-1">
-          <h3 className="text-lg font-semibold text-gray-900 mb-2 line-clamp-1">
-            {subevent.name}
-          </h3>
-          <span className={`inline-block px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(subevent.status)}`}>
-            {subevent.status}
+    <div className="bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-xl transition-all duration-300 group transform hover:-translate-y-2">
+      {/* Image Section */}
+      <div className="relative h-48 overflow-hidden bg-gradient-to-br from-blue-50 to-indigo-100">
+        {eventImage ? (
+          <img
+            src={eventImage}
+            alt={subevent.name}
+            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+            onError={(e) => {
+              e.target.style.display = "none";
+              e.target.nextSibling.style.display = "flex";
+            }}
+          />
+        ) : null}
+
+        {/* Placeholder when no image */}
+        <div
+          className={`${
+            eventImage ? "hidden" : "flex"
+          } w-full h-full items-center justify-center bg-gradient-to-br from-blue-100 to-indigo-200`}
+        >
+          <div className="text-center">
+            <ImageIcon className="w-16 h-16 text-gray-400 mx-auto mb-2" />
+            <p className="text-gray-500 text-sm font-medium">No Image</p>
+          </div>
+        </div>
+
+       
+
+        {/* Status Badge */}
+        <div className="absolute top-4 right-4">
+          <span
+            className={`inline-block px-3 py-1 rounded-full text-xs font-semibold shadow-lg backdrop-blur-sm ${getStatusColor(
+              subevent.status
+            )}`}
+          >
+            {subevent.is_active === false ? "Inactive" : "Active"}
           </span>
         </div>
-        
-        {/* Action Buttons */}
-        <div className="flex space-x-2 opacity-0 group-hover:opacity-100 transition-opacity">
-          <button
-            onClick={() => onView(subevent)}
-            className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-            title="View Details"
-          >
-            <Eye className="w-4 h-4" />
-          </button>
-          <button
-            onClick={() => onEdit(subevent)}
-            className="p-2 text-gray-600 hover:bg-gray-50 rounded-lg transition-colors"
-            title="Edit"
-          >
-            <Edit3 className="w-4 h-4" />
-          </button>
-          <button
-            onClick={() => onDelete(subevent)}
-            className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-            title="Delete"
-          >
-            <Trash2 className="w-4 h-4" />
-          </button>
+
+        {/* Day Badge */}
+        <div className="absolute top-4 left-4">
+          <div className="bg-white bg-opacity-90 backdrop-blur-sm rounded-lg px-3 py-1 shadow-lg">
+            <span className="text-xs font-medium text-gray-600">Day</span>
+            <p className="text-lg font-bold text-gray-900">{subevent.day}</p>
+          </div>
         </div>
       </div>
 
-      {/* Description */}
-      <p className="text-gray-600 text-sm mb-4 line-clamp-2">
-        {subevent.description}
-      </p>
+      {/* Content Section */}
+      <div className="p-6">
+        {/* Header */}
+        <div className="mb-4">
+          <h3 className="text-xl font-bold text-gray-900 mb-2 line-clamp-1 group-hover:text-blue-600 transition-colors duration-200">
+            {subevent.name}
+          </h3>
 
-      {/* Event Info */}
-      <div className="grid grid-cols-2 gap-3 mb-4">
-        <div className="flex items-center text-sm text-gray-600">
-          <Calendar className="w-4 h-4 mr-2 text-blue-500" />
-          <span>{new Date(subevent.date).toLocaleDateString()}</span>
+          {/* Description */}
+          <p className="text-gray-600 text-sm line-clamp-2 leading-relaxed">
+            {subevent.description ||
+              "No description available for this sub-event."}
+          </p>
         </div>
-        <div className="flex items-center text-sm text-gray-600">
-          <Clock className="w-4 h-4 mr-2 text-green-500" />
-          <span>{subevent.time}</span>
+
+        {/* Event Info Grid */}
+        <div className="space-y-3 mb-6">
+          <div className="flex items-center text-sm text-gray-700">
+            <div className="flex items-center justify-center w-8 h-8 bg-blue-50 rounded-lg mr-3">
+              <Calendar className="w-4 h-4 text-blue-500" />
+            </div>
+            <div>
+              <span className="font-medium">Date</span>
+              <p className="text-gray-600">
+                {new Date(subevent.date).toLocaleDateString("en-US", {
+                  weekday: "short",
+                  year: "numeric",
+                  month: "short",
+                  day: "numeric",
+                })}
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center text-sm text-gray-700">
+            <div className="flex items-center justify-center w-8 h-8 bg-green-50 rounded-lg mr-3">
+              <Clock className="w-4 h-4 text-green-500" />
+            </div>
+            <div>
+              <span className="font-medium">Time</span>
+              <p className="text-gray-600">
+                {subevent.start_time?.substring(0, 5)} -{" "}
+                {subevent.end_time?.substring(0, 5)}
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center text-sm text-gray-700">
+            <div className="flex items-center justify-center w-8 h-8 bg-purple-50 rounded-lg mr-3">
+              <Users className="w-4 h-4 text-purple-500" />
+            </div>
+            <div className="flex-1">
+              <span className="font-medium">Capacity</span>
+              <div className="flex items-center justify-between">
+                <p className="text-gray-600">
+                  {subevent.available_quantity || subevent.quantity}/
+                  {subevent.quantity}
+                </p>
+                <div className="w-16 bg-gray-200 rounded-full h-2">
+                  <div
+                    className="bg-gradient-to-r from-purple-400 to-purple-600 h-2 rounded-full transition-all duration-300"
+                    style={{
+                      width: `${Math.min(
+                        ((subevent.available_quantity || subevent.quantity) /
+                          subevent.quantity) *
+                          100,
+                        100
+                      )}%`,
+                    }}
+                  ></div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
-        <div className="flex items-center text-sm text-gray-600">
-          <MapPin className="w-4 h-4 mr-2 text-red-500" />
-          <span className="truncate">{subevent.venue}</span>
-        </div>
-        <div className="flex items-center text-sm text-gray-600">
-          <Users className="w-4 h-4 mr-2 text-purple-500" />
-          <span>{subevent.registrations || 0}/{subevent.capacity || 50}</span>
-        </div>
+
+        {/* Action Button */}
+        <button
+          onClick={() => onView(subevent)}
+          className="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white py-3 rounded-lg font-semibold transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] shadow-lg hover:shadow-xl"
+        >
+          View Details
+        </button>
       </div>
 
-      {/* Progress Bar */}
-      <div className="mb-4">
-        <div className="flex justify-between text-xs text-gray-600 mb-1">
-          <span>Registration</span>
-          <span>{Math.round(((subevent.registrations || 0) / (subevent.capacity || 50)) * 100)}%</span>
-        </div>
-        <div className="w-full bg-gray-200 rounded-full h-2">
-          <div 
-            className="bg-blue-600 h-2 rounded-full transition-all duration-300"
-            style={{ width: `${((subevent.registrations || 0) / (subevent.capacity || 50)) * 100}%` }}
-          />
-        </div>
-      </div>
-
-      {/* View Details Button */}
-      <button
-        onClick={() => onView(subevent)}
-        className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg font-medium transition-colors duration-200"
-      >
-        View Details
-      </button>
+      {/* Bottom Gradient Line */}
+      <div className="h-1 bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500"></div>
     </div>
   );
 };

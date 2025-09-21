@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import {
   Calendar,
   Clock,
@@ -6,23 +6,32 @@ import {
   Users,
   FileText,
   Image as ImageIcon,
-  MapPin,
   Tag,
   User,
+  ArrowLeft,
+  Save,
+  X
 } from "lucide-react";
 import InputField from "../Components/InputField";
 import CustomDatePicker from "../Components/CustomDatePicker";
 import { TimePicker } from "../Components/TimePicker";
 import { useNavigate, useParams } from "react-router-dom";
-import { useCreateSubEventMutation } from "../features/subEvents/subEventsApi";
+import { 
+  useGetSubEventByIdQuery, 
+  useUpdateSubEventMutation 
+} from "../features/subEvents/subEventsApi";
 
-function App() {
+function SubEventEditForm() {
   const navigate = useNavigate();
+  const { eventId, subEventId } = useParams();
   const [errors, setErrors] = useState({});
-  const { eventId } = useParams();
-  
-  const [createSubEvent, { isLoading, isSuccess, isError, error }] =
-    useCreateSubEventMutation();
+
+  // RTK Query hooks
+  const { data, error: fetchError, isLoading: isFetching } = useGetSubEventByIdQuery(subEventId);
+  const [updateSubEvent, { isLoading: isUpdating }] = useUpdateSubEventMutation();
+
+  // Extract subevent data
+  const existingSubEvent = data?.data;
 
   const [eventDate, setEventDate] = useState(null);
   const eventStart = new Date("2025-09-23");
@@ -41,23 +50,66 @@ function App() {
 
   const [image, setImage] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
+  const [existingImages, setExistingImages] = useState([]);
 
-  // ✅ HELPER FUNCTION: Convert HH:MM to HH:MM:SS format
-  const convertToHHMMSS = (timeString) => {
-    if (!timeString) return "";
-    
-    // If already in HH:MM:SS format, return as is
-    if (timeString.includes(":") && timeString.split(":").length === 3) {
-      return timeString;
+  // Pre-fill form when data is loaded
+  useEffect(() => {
+    if (existingSubEvent) {
+      setFormData({
+        name: existingSubEvent.name || "",
+        event_id: existingSubEvent.event_id || eventId || "",
+        date: existingSubEvent.date || "",
+        start_time: existingSubEvent.start_time || "",
+        end_time: existingSubEvent.end_time || "",
+        day: existingSubEvent.day?.toString() || "",
+        quantity: existingSubEvent.quantity?.toString() || "",
+        description: existingSubEvent.description || "",
+      });
+
+      // Set event date for date picker
+      if (existingSubEvent.date) {
+        setEventDate(new Date(existingSubEvent.date));
+      }
+
+      // Set existing images
+      if (existingSubEvent.images && Array.isArray(existingSubEvent.images)) {
+        setExistingImages(existingSubEvent.images);
+      }
     }
-    
-    // If in HH:MM format, add :00 for seconds
-    if (timeString.includes(":") && timeString.split(":").length === 2) {
-      return `${timeString}:00`;
-    }
-    
-    return timeString;
-  };
+  }, [existingSubEvent, eventId]);
+
+  // Loading state
+  if (isFetching) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading sub-event details...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Error state
+  if (fetchError || !existingSubEvent) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center">
+        <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-12 text-center max-w-md">
+          <X className="w-16 h-16 text-red-500 mx-auto mb-4" />
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">Sub Event Not Found</h2>
+          <p className="text-red-600 mb-8">
+            {fetchError?.data?.message || 'Could not load sub-event details for editing.'}
+          </p>
+          <button 
+            onClick={() => navigate(`/events/${eventId}/subevents`)}
+            className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl font-medium transition-colors duration-200"
+          >
+            Back to Sub Events
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -101,23 +153,51 @@ function App() {
     }));
   };
 
-  // ✅ FIXED: Handle time change with proper format conversion
-  const handleTimeChange = useCallback((timeType, timeValue) => {
-    console.log("handleTimeChange called with:", timeType, timeValue);
+const handleTimeChange = (timeType, timeValue) => {
+  console.log("handleTimeChange called with:", timeType, timeValue);
+  
+  // Convert HH:MM to HH:MM:SS format for backend
+  const formatToHHMMSS = (time) => {
+    if (!time) return time;
     
-    // Convert to HH:MM:SS format
-    const formattedTime = convertToHHMMSS(timeValue);
+    // If already in HH:MM:SS format, return as is
+    if (time.length === 8 && time.match(/^\d{2}:\d{2}:\d{2}$/)) {
+      return time;
+    }
     
-    setFormData((prevData) => {
-      if (prevData[timeType] === formattedTime) {
-        return prevData; // Return same object if no change
-      }
-      return {
-        ...prevData,
-        [timeType]: formattedTime,
-      };
-    });
-  }, []);
+    // If in HH:MM format, add :00 for seconds
+    if (time.length === 5 && time.match(/^\d{2}:\d{2}$/)) {
+      return `${time}:00`;
+    }
+    
+    return time;
+  };
+  
+  const formattedTime = formatToHHMMSS(timeValue);
+  
+  setFormData((prevData) => {
+    if (prevData[timeType] === formattedTime) {
+      return prevData; // Return same object if no change
+    }
+    return {
+      ...prevData,
+      [timeType]: formattedTime,
+    };
+  });
+
+  // Clear error when user changes time
+  if (errors[timeType]) {
+    setErrors((prevErrors) => ({
+      ...prevErrors,
+      [timeType]: "",
+    }));
+  }
+};
+
+
+  const removeExistingImage = (indexToRemove) => {
+    setExistingImages(prev => prev.filter((_, index) => index !== indexToRemove));
+  };
 
   const validateForm = () => {
     const newErrors = {};
@@ -157,11 +237,7 @@ function App() {
       newErrors.description = "Description is required";
     }
 
-    if (!image) {
-      newErrors.image = "Sub Event Image is required";
-    }
-
-    // Time validation with proper format
+    // Time validation
     if (formData.start_time && formData.end_time) {
       const startTime = new Date(`2000-01-01T${formData.start_time}`);
       const endTime = new Date(`2000-01-01T${formData.end_time}`);
@@ -174,56 +250,103 @@ function App() {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    const validationErrors = validateForm();
-    if (Object.keys(validationErrors).length > 0) {
-      setErrors(validationErrors);
-      return;
+  const validationErrors = validateForm();
+  if (Object.keys(validationErrors).length > 0) {
+    setErrors(validationErrors);
+    return;
+  }
+
+  try {
+    // ✅ FIXED: Completely exclude event_id from update data
+    const updateData = {
+      name: formData.name,
+      date: formData.date,
+      start_time: formData.start_time ? (
+        formData.start_time.length === 5 
+          ? `${formData.start_time}:00` 
+          : formData.start_time
+      ) : "",
+      end_time: formData.end_time ? (
+        formData.end_time.length === 5 
+          ? `${formData.end_time}:00` 
+          : formData.end_time
+      ) : "",
+      day: parseInt(formData.day),
+      quantity: parseInt(formData.quantity),
+      description: formData.description,
+    };
+    // ❌ Do NOT include event_id here at all
+
+    // Add image if new one is selected
+    if (image) {
+      updateData.image = image;
     }
 
-    try {
-      // ✅ FIXED: Ensure times are in HH:MM:SS format before submission
-      const subeventData = {
-        ...formData,
-        start_time: convertToHHMMSS(formData.start_time),
-        end_time: convertToHHMMSS(formData.end_time),
-        image: image,
-      };
+    console.log("Submitting update data:", updateData); // Debug log
 
-      console.log("Submitting data:", subeventData); // Debug log
+    await updateSubEvent({ 
+      subeventId: subEventId, 
+      subeventData: updateData 
+    }).unwrap();
 
-      await createSubEvent(subeventData).unwrap();
+    // Success - redirect back to sub-event detail or list
+    navigate(`/events/${eventId}/subevents/${subEventId}`, {
+      state: {
+        message: `Sub-event "${formData.name}" has been updated successfully!`,
+      },
+    });
+  } catch (error) {
+    console.error("Failed to update sub-event:", error);
 
-      // Success - redirect to events list
-      navigate(`/events/${eventId}/subevents`, {
-        state: {
-          message: `Sub-event ${formData.name} has been created successfully!`,
-        },
-      });
-    } catch (error) {
-      console.error("Failed to create sub-event:", error);
-
-      // Handle API errors
-      if (error?.data?.message) {
-        setErrors({ submit: error.data.message });
-      } else if (error?.data?.errors) {
-        // Handle array of error messages
-        const errorMessages = error.data.errors;
-        if (Array.isArray(errorMessages)) {
-          setErrors({ submit: errorMessages.join(", ") });
-        } else {
-          setErrors(errorMessages);
-        }
+    // Handle API errors
+    if (error?.data?.message) {
+      setErrors({ submit: error.data.message });
+    } else if (error?.data?.errors) {
+      const errorMessages = error.data.errors;
+      if (Array.isArray(errorMessages)) {
+        setErrors({ submit: errorMessages.join(", ") });
       } else {
-        setErrors({ submit: "Failed to create sub-event. Please try again." });
+        setErrors(errorMessages);
       }
+    } else {
+      setErrors({ submit: "Failed to update sub-event. Please try again." });
     }
-  };
+  }
+};
+
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 p-6">
       <div className="max-w-4xl mx-auto">
+        {/* Header */}
+        <div className="mb-8">
+          <div className="flex items-center space-x-4 mb-4">
+            <button
+              onClick={() => navigate(`/events/${eventId}/subevents/${subEventId}`)}
+              className="flex items-center space-x-2 text-gray-600 hover:text-gray-900 transition-colors duration-200 group px-3 py-2 rounded-lg hover:bg-white/50"
+            >
+              <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform duration-200" />
+              <span className="font-medium">Back to Details</span>
+            </button>
+          </div>
+          
+          <div className="flex items-center space-x-3">
+            <div className="flex items-center justify-center w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl shadow-lg">
+              <FileText className="w-6 h-6 text-white" />
+            </div>
+            <div>
+              <h1 className="text-3xl font-black bg-gradient-to-r from-gray-900 via-gray-800 to-gray-700 bg-clip-text text-transparent">
+                Edit Sub Event
+              </h1>
+              <p className="text-gray-600 mt-1">
+                Update the details for "{existingSubEvent?.name}"
+              </p>
+            </div>
+          </div>
+        </div>
+
         {/* Form Container */}
         <div className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
           {/* Display submit error if exists */}
@@ -296,58 +419,59 @@ function App() {
               </div>
 
               {/* Time Pickers */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    Start Time <span className="text-red-500">*</span>
-                  </label>
-                  <div className="relative">
-                    <TimePicker
-                      key="start-time-picker"
-                      value={formData.start_time ? formData.start_time.substring(0, 5) : ""} // Show only HH:MM in input
-                      onChange={(time) => handleTimeChange("start_time", time)}
-                      placeholder="Select start time"
-                      className="w-1/2"
-                    />
-                  </div>
-                  {errors.start_time && (
-                    <p className="text-red-500 text-sm mt-1">
-                      {errors.start_time}
-                    </p>
-                  )}
-                  {/* Debug display */}
-                  <p className="text-xs text-gray-500 mt-1">
-                    Format: {formData.start_time || "Not set"}
-                  </p>
-                </div>
+<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+  <div>
+    <label className="block text-sm font-semibold text-gray-700 mb-2">
+      Start Time <span className="text-red-500">*</span>
+    </label>
+    <div className="relative">
+      
+    <TimePicker
+          label=""
+          value={formData.start_time || ""}
+           onChange={(time) => handleTimeChange("start_time", time)}
+          placeholder="Select start time"
+          disabled={false}
+          className="w-full"
+        />
+    </div>
+    {errors.start_time && (
+      <p className="text-red-500 text-sm mt-1">
+        {errors.start_time}
+      </p>
+    )}
+    <p className="text-xs text-gray-500 mt-1">
+      Current: {formData.start_time || "Not set"}
+    </p>
+  </div>
 
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    End Time <span className="text-red-500">*</span>
-                  </label>
-                  <div className="relative">
-                    <TimePicker
-                      key="end-time-picker"
-                      value={formData.end_time ? formData.end_time.substring(0, 5) : ""} // Show only HH:MM in input
-                      onChange={(time) => handleTimeChange("end_time", time)}
-                      placeholder="Select end time"
-                      className="w-1/2"
-                    />
-                  </div>
-                  {errors.end_time && (
-                    <p className="text-red-500 text-sm mt-1">
-                      {errors.end_time}
-                    </p>
-                  )}
-                  {/* Debug display */}
-                  <p className="text-xs text-gray-500 mt-1">
-                    Format: {formData.end_time || "Not set"}
-                  </p>
-                </div>
-              </div>
+  <div>
+    <label className="block text-sm font-semibold text-gray-700 mb-2">
+      End Time <span className="text-red-500">*</span>
+    </label>
+    <div className="relative">
+     <TimePicker
+          label=""
+          value={formData.end_time || ""}
+          onChange={(time) => handleTimeChange("end_time", time)}
+          placeholder="Select end time"
+          disabled={false}
+          className="w-full"
+        />
+    </div>
+    {errors.end_time && (
+      <p className="text-red-500 text-sm mt-1">
+        {errors.end_time}
+      </p>
+    )}
+    <p className="text-xs text-gray-500 mt-1">
+      Current: {formData.end_time || "Not set"}
+    </p>
+  </div>
+</div>
+
             </div>
 
-            {/* Rest of your form components remain the same... */}
             {/* Event Details Section */}
             <div className="space-y-6">
               <div className="flex items-center space-x-2 pb-4 border-b border-gray-200">
@@ -415,10 +539,37 @@ function App() {
                 <h3 className="text-lg font-semibold text-gray-800">Media</h3>
               </div>
 
-              {/* Upload Image */}
+              {/* Existing Images */}
+              {existingImages.length > 0 && (
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-3">
+                    Current Images
+                  </label>
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-4">
+                    {existingImages.map((imageUrl, index) => (
+                      <div key={index} className="relative group">
+                        <img 
+                          src={imageUrl} 
+                          alt={`Existing ${index + 1}`}
+                          className="w-full h-32 object-cover rounded-lg border border-gray-200"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => removeExistingImage(index)}
+                          className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center hover:bg-red-600 transition-colors shadow-lg opacity-0 group-hover:opacity-100"
+                        >
+                          <X className="w-3 h-3" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Upload New Image */}
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-3">
-                  Sub Event Image <span className="text-red-500">*</span>
+                  Add New Image <span className="text-gray-500">(Optional)</span>
                 </label>
                 <div className="border-2 border-dashed border-gray-300 rounded-xl p-6 bg-gray-50 hover:bg-gray-100 transition-colors">
                   <div className="flex flex-col items-center space-y-4">
@@ -431,7 +582,7 @@ function App() {
                         className="cursor-pointer inline-flex items-center px-6 py-3 bg-blue-500 hover:bg-blue-600 text-white font-medium rounded-xl transition-colors shadow-lg hover:shadow-xl"
                       >
                         <ImageIcon className="w-5 h-5 mr-2" />
-                        Choose Image
+                        Choose New Image
                       </label>
                       <input
                         type="file"
@@ -446,13 +597,13 @@ function App() {
                     </div>
                   </div>
 
-                  {/* Image Preview */}
+                  {/* New Image Preview */}
                   {imagePreview && (
                     <div className="mt-6 flex justify-center">
                       <div className="relative">
                         <img
                           src={imagePreview}
-                          alt="Preview"
+                          alt="New preview"
                           className="w-40 h-40 object-cover rounded-xl border-4 border-white shadow-lg"
                         />
                         <button
@@ -463,7 +614,7 @@ function App() {
                           }}
                           className="absolute -top-2 -right-2 w-8 h-8 bg-red-500 text-white rounded-full flex items-center justify-center hover:bg-red-600 transition-colors shadow-lg"
                         >
-                          ×
+                          <X className="w-4 h-4" />
                         </button>
                       </div>
                     </div>
@@ -481,9 +632,9 @@ function App() {
             <div className="flex justify-end space-x-4 pt-8 border-t border-gray-200">
               <button
                 type="button"
-                onClick={() => navigate(-1)}
+                onClick={() => navigate(`/events/${eventId}/subevents/${subEventId}`)}
                 className="px-8 py-3 border-2 border-gray-300 rounded-xl text-gray-700 font-medium hover:bg-gray-50 hover:border-gray-400 transition-all duration-200 focus:outline-none focus:ring-4 focus:ring-gray-200"
-                disabled={isLoading}
+                disabled={isUpdating}
               >
                 Cancel
               </button>
@@ -491,17 +642,17 @@ function App() {
               <button
                 type="submit"
                 className="px-8 py-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white font-medium rounded-xl hover:from-blue-600 hover:to-purple-700 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-4 focus:ring-blue-200 shadow-lg hover:shadow-xl"
-                disabled={isLoading}
+                disabled={isUpdating}
               >
-                {isLoading ? (
+                {isUpdating ? (
                   <div className="flex items-center space-x-2">
                     <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                    <span>Creating...</span>
+                    <span>Updating...</span>
                   </div>
                 ) : (
                   <div className="flex items-center space-x-2">
-                    <Calendar className="w-5 h-5" />
-                    <span>Create Sub Event</span>
+                    <Save className="w-5 h-5" />
+                    <span>Update Sub Event</span>
                   </div>
                 )}
               </button>
@@ -513,4 +664,4 @@ function App() {
   );
 }
 
-export default App;
+export default SubEventEditForm;
