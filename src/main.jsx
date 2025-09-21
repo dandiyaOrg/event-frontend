@@ -80,7 +80,7 @@ const router = createBrowserRouter(
 
 
         {/* Transaction Routes  */}
-        <Route path="transactions" element={<Transactions />} />
+        <Route path="/transactions" element={<Transactions />} />
         <Route path="/transactions/:transactionId" element={<TransactionDetail />} />
 
         {/* Billing Users Routes */}

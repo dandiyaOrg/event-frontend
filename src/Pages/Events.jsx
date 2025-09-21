@@ -33,9 +33,10 @@ function Events() {
     <div className="px-8 min-h-screen bg-gray-50 py-8">
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-4xl font-extrabold text-gray-800 tracking-tight">
-          Events
-        </h1>
+        <h1 className="text-5xl font-black text-gray-900 tracking-tight mb-4">
+                Events
+                
+              </h1>
         <p className="text-gray-600 mt-2">
           {events.length} total events
         </p>

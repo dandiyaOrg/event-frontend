@@ -2,6 +2,7 @@ import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import { setCredentials, logout, setSession } from './authSlice';
 import { BASE_URL } from '../../config/baseUrl.js';
 
+
 const baseQuery = fetchBaseQuery({
     
     baseUrl: BASE_URL,
@@ -14,7 +15,9 @@ const baseQuery = fetchBaseQuery({
         if (adminId){
             headers.set('x-admin-id', adminId);
         }
-
+        
+        headers.set('X-Client-Token', import.meta.env.VITE_CLIENT_SECRET_TOKEN);
+        
         return headers;
     }
 })
