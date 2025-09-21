@@ -23,6 +23,8 @@ import SubEventDetails from "./Pages/SubEventDetail";
 import SubEventEditFrom from "./Pages/SubEventEditFrom.jsx";
 import PassTable from "./Components/PassTable.jsx";
 import PassCreateForm from "./Pages/PassCreateForm.jsx";
+import PassDetail from "./Pages/PassDetail.jsx";
+import PassEditForm from "./Pages/PassEditForm.jsx"
 import Employees from "./Pages/Employees";
 import EmployeeDetail from "./Pages/EmployeeDetail.jsx";
 import EmployeeDetailForm from "./Pages/EmployeeDetailForm";
@@ -92,6 +94,15 @@ const router = createBrowserRouter(
         <Route
           path="/events/:eventId/subevents/:subEventId/passes/create"
           element={<PassCreateForm />}
+        />
+        <Route
+          path="/events/:eventId/subevents/:subEventId/passes/:passId"
+          element={<PassDetail />}
+        />
+
+        <Route
+          path="/events/:eventId/subevents/:subEventId/passes/:passId/edit"
+          element={<PassEditForm/>}
         />
 
         {/* Employee Routes */}

@@ -24,8 +24,8 @@ export const passTableApi = apiSlice.injectEndpoints({
     // Update pass - PATCH /api/pass/:passId
     updatePass: builder.mutation({
       query: ({ passId, passData }) => ({
-        url: `/${passId}`,
-        method: "PUT",
+        url: `pass/${passId}`,
+        method: "PATCH",
         body: passData,
       }),
     }),
@@ -39,7 +39,7 @@ export const passTableApi = apiSlice.injectEndpoints({
 
     deletePass: builder.mutation({
       query: (passId) => ({
-        url: `/${passId}`,
+        url: `pass/${passId}`,
         method: "DELETE",
       }),
     }),

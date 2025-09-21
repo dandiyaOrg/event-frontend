@@ -16,10 +16,11 @@ import {
   Plus,
   ArrowUpRight,
   ArrowDownRight,
+  Sparkles,
+  BarChart3,
 } from "lucide-react";
 import CustomizableTable from "../Components/CustomizableTable";
 import AnalyticsModal from "../Components/Analytics/AnalyticsModal";
-
 
 import mockData from '../Data/MockData.json';
 
@@ -96,25 +97,25 @@ const Dashboard = () => {
     {
       title: "Create New Event",
       icon: CalendarDays,
-      color: "bg-blue-600",
+      gradient: "from-blue-500 to-blue-700",
       action: () => navigate("/events/new"),
     },
     {
       title: "Add Attendee",
       icon: Users,
-      color: "bg-green-600",
+      gradient: "from-emerald-500 to-emerald-700",
       action: () => navigate("/attendee"),
     },
     {
       title: "New Order",
       icon: CreditCard,
-      color: "bg-purple-600",
+      gradient: "from-purple-500 to-purple-700",
       action: () => navigate("/orders"),
     },
     {
       title: "View Analytics",
       icon: TrendingUp,
-      color: "bg-orange-600",
+      gradient: "from-indigo-500 to-indigo-700",
       action: () => navigate("/analytics"),
     },
   ];
@@ -125,50 +126,59 @@ const Dashboard = () => {
     icon: Icon,
     trend,
     trendValue,
-    color = "blue",
+    gradient,
     onClick,
   }) => (
     <div
-      className="bg-white rounded-lg shadow-sm border border-gray-200 p-6"
+      className="group relative overflow-hidden bg-white rounded-3xl shadow-xl border border-slate-200 hover:shadow-2xl transform hover:scale-105 transition-all duration-500 cursor-pointer"
       onClick={onClick}
     >
-      <div className="flex items-center justify-between">
-        <div>
-          <p className="text-sm font-medium text-gray-600 mb-1">{title}</p>
-          <p className="text-3xl font-bold text-gray-900">{value}</p>
+      <div className={`absolute inset-0 bg-gradient-to-br ${gradient} opacity-5 group-hover:opacity-10 transition-opacity duration-500`}></div>
+      <div className="relative p-8">
+        <div className="flex items-center justify-between mb-4">
+          <div className={`p-4 bg-gradient-to-br ${gradient} rounded-2xl shadow-lg group-hover:scale-110 transition-transform duration-300`}>
+            <Icon className="w-8 h-8 text-white" />
+          </div>
           {trend && (
             <div
-              className={`flex items-center mt-2 ${
-                trend === "up" ? "text-green-600" : "text-red-600"
+              className={`flex items-center px-3 py-1 rounded-full text-sm font-bold ${
+                trend === "up" 
+                  ? "bg-emerald-100 text-emerald-700" 
+                  : "bg-red-100 text-red-700"
               }`}
             >
               {trend === "up" ? (
-                <ArrowUpRight className="w-4 h-4" />
+                <ArrowUpRight className="w-4 h-4 mr-1" />
               ) : (
-                <ArrowDownRight className="w-4 h-4" />
+                <ArrowDownRight className="w-4 h-4 mr-1" />
               )}
-              <span className="text-sm font-medium ml-1">{trendValue}</span>
+              <span>{trendValue}</span>
             </div>
           )}
         </div>
-        <div className={`p-3 rounded-full bg-${color}-100`}>
-          <Icon className={`w-6 h-6 text-${color}-600`} />
+        <div>
+          <p className="text-slate-600 font-semibold text-sm uppercase tracking-wide mb-2">{title}</p>
+          <p className="text-4xl font-black text-slate-900 group-hover:text-blue-700 transition-colors duration-300">{value}</p>
         </div>
       </div>
     </div>
   );
 
-  const QuickActionCard = ({ title, icon: Icon, color, action }) => (
+  const QuickActionCard = ({ title, icon: Icon, gradient, action }) => (
     <div
       onClick={action}
-      className={`${color} hover:opacity-90 text-white p-6 rounded-lg cursor-pointer transition-all duration-200 transform hover:scale-105`}
+      className={`group relative overflow-hidden bg-gradient-to-br ${gradient} hover:shadow-2xl text-white p-8 rounded-3xl cursor-pointer transition-all duration-500 transform hover:scale-105`}
     >
-      <div className="flex items-center justify-between">
+      <div className="absolute inset-0 bg-black/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+      <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-700"></div>
+      <div className="relative z-10 flex items-center justify-between">
         <div>
-          <h3 className="text-lg font-semibold mb-1">{title}</h3>
-          <p className="text-white/80 text-sm">Click to get started</p>
+          <h3 className="text-xl font-black mb-2">{title}</h3>
+          <p className="text-white/80 font-medium">Click to get started</p>
         </div>
-        <Icon className="w-8 h-8" />
+        <div className="p-3 bg-white/20 rounded-2xl group-hover:rotate-12 transition-transform duration-300">
+          <Icon className="w-8 h-8" />
+        </div>
       </div>
     </div>
   );
@@ -191,51 +201,53 @@ const Dashboard = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-purple-50/30 p-6">
       <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="mb-8">
-          <div className="flex justify-between items-center">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">
-                Dashboard
-              </h1>
-              <p className="text-gray-600">
-                Welcome back! Here's what's happening with your events.
-              </p>
-              <p className="text-sm text-gray-500 mt-1">
-                {currentTime.toLocaleDateString("en-IN", {
-                  weekday: "long",
-                  year: "numeric",
-                  month: "long",
-                  day: "numeric",
-                  hour: "2-digit",
-                  minute: "2-digit",
-                })}
-              </p>
-            </div>
-            <div className="flex gap-3">
-              <button className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-colors duration-200 shadow-sm flex items-center space-x-2">
-                <Eye className="w-5 h-5" />
-                <span>View Reports</span>
-              </button>
-              <button className="bg-gray-800 hover:bg-gray-900 text-white px-6 py-3 rounded-lg font-medium transition-colors duration-200 shadow-sm flex items-center space-x-2">
-                <Plus className="w-5 h-5" />
-                <span>Quick Add</span>
-              </button>
+        {/* Enhanced Header */}
+        <div className="mb-12">
+          <div className="relative overflow-hidden bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-700 rounded-3xl p-10 shadow-2xl">
+            <div className="absolute inset-0 bg-black/10"></div>
+            <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-white/10 to-transparent rounded-full blur-3xl"></div>
+            <div className="relative z-10 flex justify-between items-center">
+              <div>
+                <div className="flex items-center space-x-4 mb-4">
+                  <div className="p-4 bg-white/20 backdrop-blur-sm rounded-2xl">
+                    <BarChart3 className="w-10 h-10 text-white" />
+                  </div>
+                  <div>
+                    <h1 className="text-5xl font-black text-white tracking-tight">
+                      Dashboard
+                    </h1>
+                    <p className="text-blue-100 text-xl font-semibold mt-2">
+                      Event Management System
+                    </p>
+                  </div>
+                </div>
+                <p className="text-blue-100 font-medium mb-2">
+                  Welcome back! Here's what's happening with your events.
+                </p>
+                <div className="flex items-center space-x-4">
+                  <div className="flex items-center space-x-2 bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full">
+                    <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                    <span className="text-white font-semibold text-sm">Live Data</span>
+                  </div>
+                  
+                </div>
+              </div>
+              
             </div>
           </div>
         </div>
 
-        {/* KPI Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        {/* Enhanced KPI Stats Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
           <StatCard
             title="Total Events"
             value={totalEvents}
             icon={Calendar}
             trend="up"
             trendValue="12% vs last month"
-            color="blue"
+            gradient="from-blue-500 to-blue-700"
             onClick={() =>
               setAnalyticsModal({
                 isOpen: true,
@@ -250,7 +262,7 @@ const Dashboard = () => {
             icon={Users}
             trend="up"
             trendValue="8% vs last month"
-            color="green"
+            gradient="from-emerald-500 to-emerald-700"
             onClick={() =>
               setAnalyticsModal({
                 isOpen: true,
@@ -265,7 +277,7 @@ const Dashboard = () => {
             icon={DollarSign}
             trend="up"
             trendValue="15% vs last month"
-            color="purple"
+            gradient="from-purple-500 to-purple-700"
             onClick={() =>
               setAnalyticsModal({
                 isOpen: true,
@@ -280,7 +292,7 @@ const Dashboard = () => {
             icon={UserCheck}
             trend="down"
             trendValue="3% vs yesterday"
-            color="orange"
+            gradient="from-indigo-500 to-indigo-700"
             onClick={() =>
               setAnalyticsModal({
                 isOpen: true,
@@ -291,93 +303,115 @@ const Dashboard = () => {
           />
         </div>
 
-        {/* Secondary Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        {/* Enhanced Secondary Stats */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
+          <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-xl border border-white/50 p-8 hover:shadow-2xl transition-all duration-300">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">
+                <p className="text-slate-600 font-bold text-sm uppercase tracking-wide mb-2">
                   Active Events
                 </p>
-                <p className="text-2xl font-bold text-blue-600">
+                <p className="text-3xl font-black text-blue-600">
                   {activeEvents}
                 </p>
               </div>
-              <Activity className="w-8 h-8 text-blue-600" />
+              <div className="p-4 bg-blue-100 rounded-2xl">
+                <Activity className="w-8 h-8 text-blue-600" />
+              </div>
             </div>
           </div>
 
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+          <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-xl border border-white/50 p-8 hover:shadow-2xl transition-all duration-300">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Completed</p>
-                <p className="text-2xl font-bold text-green-600">
+                <p className="text-slate-600 font-bold text-sm uppercase tracking-wide mb-2">Completed</p>
+                <p className="text-3xl font-black text-emerald-600">
                   {completedEvents}
                 </p>
               </div>
-              <CalendarDays className="w-8 h-8 text-green-600" />
+              <div className="p-4 bg-emerald-100 rounded-2xl">
+                <CalendarDays className="w-8 h-8 text-emerald-600" />
+              </div>
             </div>
           </div>
 
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+          <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-xl border border-white/50 p-8 hover:shadow-2xl transition-all duration-300">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">
+                <p className="text-slate-600 font-bold text-sm uppercase tracking-wide mb-2">
                   Pending Orders
                 </p>
-                <p className="text-2xl font-bold text-yellow-600">
+                <p className="text-3xl font-black text-amber-600">
                   {pendingOrders}
                 </p>
               </div>
-              <Clock className="w-8 h-8 text-yellow-600" />
+              <div className="p-4 bg-amber-100 rounded-2xl">
+                <Clock className="w-8 h-8 text-amber-600" />
+              </div>
             </div>
           </div>
 
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+          <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-xl border border-white/50 p-8 hover:shadow-2xl transition-all duration-300">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">
+                <p className="text-slate-600 font-bold text-sm uppercase tracking-wide mb-2">
                   Confirmed Attendees
                 </p>
-                <p className="text-2xl font-bold text-purple-600">
+                <p className="text-3xl font-black text-purple-600">
                   {confirmedAttendees}
                 </p>
               </div>
-              <UserCheck className="w-8 h-8 text-purple-600" />
+              <div className="p-4 bg-purple-100 rounded-2xl">
+                <UserCheck className="w-8 h-8 text-purple-600" />
+              </div>
             </div>
           </div>
         </div>
 
-        {/* Quick Actions */}
-        <div className="mb-8">
-          <h2 className="text-xl font-bold text-gray-900 mb-4">
-            Quick Actions
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        {/* Enhanced Quick Actions */}
+        <div className="mb-12">
+          <div className="flex items-center space-x-4 mb-8">
+            <div className="p-3 bg-blue-500 rounded-2xl">
+              <Sparkles className="w-6 h-6 text-white" />
+            </div>
+            <h2 className="text-3xl font-black text-slate-900">
+              Quick Actions
+            </h2>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {quickActions.map((action, index) => (
               <QuickActionCard key={index} {...action} />
             ))}
           </div>
         </div>
 
-        {/* Main Content Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-          {/* Recent Orders */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-            <div className="p-6 border-b border-gray-200">
+        {/* Enhanced Main Content Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
+          {/* Enhanced Recent Orders */}
+          <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/50 overflow-hidden">
+            <div className="bg-gradient-to-r from-slate-800 via-slate-700 to-slate-900 px-8 py-6">
               <div className="flex justify-between items-center">
-                <h2 className="text-xl font-bold text-gray-900">
-                  Recent Orders
-                </h2>
+                <div className="flex items-center space-x-4">
+                  <div className="p-3 bg-white/10 rounded-xl">
+                    <CreditCard className="w-6 h-6 text-white" />
+                  </div>
+                  <div>
+                    <h2 className="text-2xl font-black text-white">
+                      Recent Orders
+                    </h2>
+                    <p className="text-slate-300 font-medium">Latest transactions</p>
+                  </div>
+                </div>
                 <button
                   onClick={() => navigate("/orders")}
-                  className="text-blue-600 hover:text-blue-800 text-sm font-medium"
+                  className="text-blue-300 hover:text-white font-bold transition-colors duration-300 flex items-center space-x-2"
                 >
-                  View All →
+                  <span>View All</span>
+                  <ArrowUpRight className="w-4 h-4" />
                 </button>
               </div>
             </div>
-            <div className="p-6">
+            <div className="p-8">
               <CustomizableTable
                 data={recentOrders}
                 allColumns={recentOrderColumns}
@@ -390,14 +424,22 @@ const Dashboard = () => {
             </div>
           </div>
 
-          {/* Recent Activity Feed */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-            <div className="p-6 border-b border-gray-200">
-              <h2 className="text-xl font-bold text-gray-900">
-                Recent Check-ins
-              </h2>
+          {/* Enhanced Recent Activity Feed */}
+          <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/50 overflow-hidden">
+            <div className="bg-gradient-to-r from-slate-800 via-slate-700 to-slate-900 px-8 py-6">
+              <div className="flex items-center space-x-4">
+                <div className="p-3 bg-white/10 rounded-xl">
+                  <Activity className="w-6 h-6 text-white" />
+                </div>
+                <div>
+                  <h2 className="text-2xl font-black text-white">
+                    Recent Check-ins
+                  </h2>
+                  <p className="text-slate-300 font-medium">Live activity feed</p>
+                </div>
+              </div>
             </div>
-            <div className="p-6">
+            <div className="p-8">
               <div className="space-y-4">
                 {recentCheckIns.map((checkIn, index) => {
                   const attendee = allAttendeesData.find(
@@ -406,24 +448,24 @@ const Dashboard = () => {
                   return (
                     <div
                       key={index}
-                      className="flex items-center space-x-4 p-3 hover:bg-gray-50 rounded-lg"
+                      className="group flex items-center space-x-4 p-6 hover:bg-blue-50 rounded-2xl border-2 border-transparent hover:border-blue-200 transition-all duration-300"
                     >
-                      <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                        <UserCheck className="w-5 h-5 text-blue-600" />
+                      <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-700 rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300">
+                        <UserCheck className="w-6 h-6 text-white" />
                       </div>
                       <div className="flex-1">
-                        <p className="text-sm font-medium text-gray-900">
+                        <p className="font-bold text-slate-900">
                           {attendee?.name || "Unknown"} checked into
                         </p>
-                        <p className="text-sm text-blue-600 font-medium">
+                        <p className="font-bold text-blue-600">
                           {checkIn.subEventName}
                         </p>
-                        <p className="text-xs text-gray-500">
+                        <p className="text-sm text-slate-600 font-medium">
                           {checkIn.checkInTime} • {checkIn.gateNumber} • by{" "}
                           {checkIn.employeeName}
                         </p>
                       </div>
-                      <div className="text-xs text-gray-400">
+                      <div className="text-sm font-bold text-slate-500 bg-slate-100 px-3 py-1 rounded-full">
                         {new Date(checkIn.checkInDate).toLocaleDateString()}
                       </div>
                     </div>
@@ -434,22 +476,31 @@ const Dashboard = () => {
           </div>
         </div>
 
-        {/* Upcoming Events */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 mb-8">
-          <div className="p-6 border-b border-gray-200">
+        {/* Enhanced Upcoming Events */}
+        <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/50 overflow-hidden mb-12">
+          <div className="bg-gradient-to-r from-slate-800 via-slate-700 to-slate-900 px-8 py-6">
             <div className="flex justify-between items-center">
-              <h2 className="text-xl font-bold text-gray-900">
-                Upcoming Events
-              </h2>
+              <div className="flex items-center space-x-4">
+                <div className="p-3 bg-white/10 rounded-xl">
+                  <Calendar className="w-6 h-6 text-white" />
+                </div>
+                <div>
+                  <h2 className="text-2xl font-black text-white">
+                    Upcoming Events
+                  </h2>
+                  <p className="text-slate-300 font-medium">Events scheduled ahead</p>
+                </div>
+              </div>
               <button
                 onClick={() => navigate("/events")}
-                className="text-blue-600 hover:text-blue-800 text-sm font-medium"
+                className="text-blue-300 hover:text-white font-bold transition-colors duration-300 flex items-center space-x-2"
               >
-                View All →
+                <span>View All</span>
+                <ArrowUpRight className="w-4 h-4" />
               </button>
             </div>
           </div>
-          <div className="p-6">
+          <div className="p-8">
             {upcomingEvents.length > 0 ? (
               <CustomizableTable
                 data={upcomingEvents}
@@ -461,17 +512,19 @@ const Dashboard = () => {
                 rowsPerPageOptions={[17]}
               />
             ) : (
-              <div className="text-center py-8">
-                <Calendar className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">
+              <div className="text-center py-16">
+                <div className="w-24 h-24 bg-gradient-to-br from-blue-100 to-purple-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                  <Calendar className="w-12 h-12 text-blue-600" />
+                </div>
+                <h3 className="text-2xl font-black text-slate-900 mb-3">
                   No Upcoming Events
                 </h3>
-                <p className="text-gray-600 mb-4">
+                <p className="text-slate-600 mb-8 text-lg">
                   Create your first event to get started
                 </p>
                 <button
                   onClick={() => navigate("/events/new")}
-                  className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium"
+                  className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white px-8 py-4 rounded-2xl font-bold transition-all duration-300 shadow-xl hover:shadow-2xl transform hover:scale-105"
                 >
                   Create Event
                 </button>
@@ -480,44 +533,55 @@ const Dashboard = () => {
           </div>
         </div>
 
-        {/* Top Performing Events */}
+        {/* Enhanced Bottom Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-            <div className="p-6 border-b border-gray-200">
-              <h2 className="text-xl font-bold text-gray-900">
-                Top Performing Events
-              </h2>
+          {/* Enhanced Top Performing Events */}
+          <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/50 overflow-hidden">
+            <div className="bg-gradient-to-r from-slate-800 via-slate-700 to-slate-900 px-8 py-6">
+              <div className="flex items-center space-x-4">
+                <div className="p-3 bg-white/10 rounded-xl">
+                  <TrendingUp className="w-6 h-6 text-white" />
+                </div>
+                <div>
+                  <h2 className="text-2xl font-black text-white">
+                    Top Performing Events
+                  </h2>
+                  <p className="text-slate-300 font-medium">Highest revenue generators</p>
+                </div>
+              </div>
             </div>
-            <div className="p-6">
+            <div className="p-8">
               <div className="space-y-4">
                 {topEvents.map((event, index) => (
                   <div
                     key={index}
-                    className="flex items-center space-x-4 p-3 hover:bg-gray-50 rounded-lg cursor-pointer"
+                    className="group flex items-center space-x-6 p-6 hover:bg-gradient-to-r hover:from-purple-50 hover:to-blue-50 rounded-2xl cursor-pointer transition-all duration-300 border-2 border-transparent hover:border-purple-200"
                     onClick={() =>
                       navigate(`/orders/${event.id}`, {
                         state: { order: event },
                       })
                     }
                   >
-                    <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
-                      <span className="text-sm font-bold text-purple-600">
+                    <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-purple-700 rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300">
+                      <span className="text-lg font-black text-white">
                         #{index + 1}
                       </span>
                     </div>
                     <div className="flex-1">
-                      <p className="font-medium text-gray-900">
+                      <p className="font-black text-slate-900 text-lg">
                         {event.eventName}
                       </p>
-                      <p className="text-sm text-gray-600">
+                      <p className="font-semibold text-slate-600">
                         {event.attendees} attendees
                       </p>
                     </div>
                     <div className="text-right">
-                      <p className="font-semibold text-green-600">
+                      <p className="font-black text-emerald-600 text-xl">
                         ₹{event.amount.toLocaleString()}
                       </p>
-                      <p className="text-xs text-gray-500">{event.status}</p>
+                      <p className="text-sm font-bold text-slate-500 bg-slate-100 px-3 py-1 rounded-full">
+                        {event.status}
+                      </p>
                     </div>
                   </div>
                 ))}
@@ -525,27 +589,35 @@ const Dashboard = () => {
             </div>
           </div>
 
-          {/* Quick Stats Summary */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-            <div className="p-6 border-b border-gray-200">
-              <h2 className="text-xl font-bold text-gray-900">
-                System Overview
-              </h2>
-            </div>
-            <div className="p-6">
-              <div className="space-y-6">
+          {/* Enhanced System Overview */}
+          <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/50 overflow-hidden">
+            <div className="bg-gradient-to-r from-slate-800 via-slate-700 to-slate-900 px-8 py-6">
+              <div className="flex items-center space-x-4">
+                <div className="p-3 bg-white/10 rounded-xl">
+                  <BarChart3 className="w-6 h-6 text-white" />
+                </div>
                 <div>
-                  <div className="flex justify-between items-center mb-2">
-                    <span className="text-sm font-medium text-gray-600">
+                  <h2 className="text-2xl font-black text-white">
+                    System Overview
+                  </h2>
+                  <p className="text-slate-300 font-medium">Performance metrics</p>
+                </div>
+              </div>
+            </div>
+            <div className="p-8">
+              <div className="space-y-8">
+                <div>
+                  <div className="flex justify-between items-center mb-4">
+                    <span className="font-bold text-slate-700">
                       Event Completion Rate
                     </span>
-                    <span className="text-sm font-bold text-gray-900">
+                    <span className="font-black text-slate-900 text-lg">
                       {Math.round((completedEvents / totalEvents) * 100)}%
                     </span>
                   </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2">
+                  <div className="w-full bg-slate-200 rounded-full h-4">
                     <div
-                      className="bg-green-600 h-2 rounded-full"
+                      className="bg-gradient-to-r from-emerald-500 to-emerald-600 h-4 rounded-full shadow-lg"
                       style={{
                         width: `${(completedEvents / totalEvents) * 100}%`,
                       }}
@@ -554,17 +626,17 @@ const Dashboard = () => {
                 </div>
 
                 <div>
-                  <div className="flex justify-between items-center mb-2">
-                    <span className="text-sm font-medium text-gray-600">
+                  <div className="flex justify-between items-center mb-4">
+                    <span className="font-bold text-slate-700">
                       Attendee Confirmation Rate
                     </span>
-                    <span className="text-sm font-bold text-gray-900">
+                    <span className="font-black text-slate-900 text-lg">
                       {Math.round((confirmedAttendees / totalAttendees) * 100)}%
                     </span>
                   </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2">
+                  <div className="w-full bg-slate-200 rounded-full h-4">
                     <div
-                      className="bg-blue-600 h-2 rounded-full"
+                      className="bg-gradient-to-r from-blue-500 to-blue-600 h-4 rounded-full shadow-lg"
                       style={{
                         width: `${
                           (confirmedAttendees / totalAttendees) * 100
@@ -575,11 +647,11 @@ const Dashboard = () => {
                 </div>
 
                 <div>
-                  <div className="flex justify-between items-center mb-2">
-                    <span className="text-sm font-medium text-gray-600">
+                  <div className="flex justify-between items-center mb-4">
+                    <span className="font-bold text-slate-700">
                       Check-in Rate
                     </span>
-                    <span className="text-sm font-bold text-gray-900">
+                    <span className="font-black text-slate-900 text-lg">
                       {Math.round(
                         (allAttendeesData.filter((att) => att.checkedIn)
                           .length /
@@ -589,9 +661,9 @@ const Dashboard = () => {
                       %
                     </span>
                   </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2">
+                  <div className="w-full bg-slate-200 rounded-full h-4">
                     <div
-                      className="bg-purple-600 h-2 rounded-full"
+                      className="bg-gradient-to-r from-purple-500 to-purple-600 h-4 rounded-full shadow-lg"
                       style={{
                         width: `${
                           (allAttendeesData.filter((att) => att.checkedIn)
@@ -604,22 +676,22 @@ const Dashboard = () => {
                   </div>
                 </div>
 
-                <div className="pt-4 border-t border-gray-100">
-                  <div className="grid grid-cols-2 gap-4 text-center">
-                    <div>
-                      <p className="text-2xl font-bold text-gray-900">
+                <div className="pt-8 border-t border-slate-200">
+                  <div className="grid grid-cols-2 gap-8">
+                    <div className="text-center p-6 bg-gradient-to-br from-blue-50 to-blue-100 rounded-2xl">
+                      <p className="text-3xl font-black text-blue-700">
                         {billingUsersData.length}
                       </p>
-                      <p className="text-sm text-gray-600">Active Clients</p>
+                      <p className="font-bold text-blue-600">Active Clients</p>
                     </div>
-                    <div>
-                      <p className="text-2xl font-bold text-gray-900">
+                    <div className="text-center p-6 bg-gradient-to-br from-emerald-50 to-emerald-100 rounded-2xl">
+                      <p className="text-3xl font-black text-emerald-700">
                         ₹
                         {Math.round(
                           totalRevenue / totalAttendees
                         ).toLocaleString()}
                       </p>
-                      <p className="text-sm text-gray-600">
+                      <p className="font-bold text-emerald-600">
                         Avg. Revenue/Attendee
                       </p>
                     </div>
