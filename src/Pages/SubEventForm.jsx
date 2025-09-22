@@ -43,21 +43,28 @@ function App() {
   const [imagePreview, setImagePreview] = useState(null);
 
   // ✅ HELPER FUNCTION: Convert HH:MM to HH:MM:SS format
-  const convertToHHMMSS = (timeString) => {
-    if (!timeString) return "";
-    
-    // If already in HH:MM:SS format, return as is
-    if (timeString.includes(":") && timeString.split(":").length === 3) {
-      return timeString;
-    }
-    
-    // If in HH:MM format, add :00 for seconds
-    if (timeString.includes(":") && timeString.split(":").length === 2) {
-      return `${timeString}:00`;
-    }
-    
-    return timeString;
-  };
+const convertToHHMM = (timeString) => {
+  if (!timeString) return "";
+
+  // If already in HH:MM:SS → keep only HH:MM
+  if (timeString.includes(":") && timeString.split(":").length === 3) {
+    const [hh, mm] = timeString.split(":");
+    return `${hh.padStart(2, "0")}:${mm.padStart(2, "0")}`;
+  }
+
+  // If already in HH:MM → normalize and return
+  if (timeString.includes(":") && timeString.split(":").length === 2) {
+    const [hh, mm] = timeString.split(":");
+    return `${hh.padStart(2, "0")}:${mm.padStart(2, "0")}`;
+  }
+
+  // If only hours given → make HH:00
+  if (/^\d{1,2}$/.test(timeString)) {
+    return `${timeString.padStart(2, "0")}:00`;
+  }
+
+  return timeString; // fallback
+};
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -106,7 +113,7 @@ function App() {
     console.log("handleTimeChange called with:", timeType, timeValue);
     
     // Convert to HH:MM:SS format
-    const formattedTime = convertToHHMMSS(timeValue);
+    const formattedTime = convertToHHMM(timeValue);
     
     setFormData((prevData) => {
       if (prevData[timeType] === formattedTime) {
@@ -186,8 +193,8 @@ function App() {
       // ✅ FIXED: Ensure times are in HH:MM:SS format before submission
       const subeventData = {
         ...formData,
-        start_time: convertToHHMMSS(formData.start_time),
-        end_time: convertToHHMMSS(formData.end_time),
+        start_time: convertToHHMM(formData.start_time),
+        end_time: convertToHHMM(formData.end_time),
         image: image,
       };
 
