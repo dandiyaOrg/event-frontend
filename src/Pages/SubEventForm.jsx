@@ -25,8 +25,8 @@ function App() {
     useCreateSubEventMutation();
 
   const [eventDate, setEventDate] = useState(null);
-  const eventStart = new Date("2025-09-23");
-  const eventEnd = new Date("2025-10-01");
+  const eventStart = new Date("2025-09-27");
+  const eventEnd = new Date("2025-09-30");
 
   const [formData, setFormData] = useState({
     name: "",
