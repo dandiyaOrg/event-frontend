@@ -1,34 +1,26 @@
 import React, { useState } from "react";
 
 import { useLoginMutation } from '../features/auth/authApi';
-
 import { useNavigate, Link } from "react-router-dom";
-import SignUp from "./SignUp";
-
 import { MdKey } from "react-icons/md";
 import { IoEyeOffOutline } from "react-icons/io5";
 import { IoEyeOutline } from "react-icons/io5";
-import OTPModal from "../Components/OtpModal"; // Import the OTP Modal component
+
+import Poster from '../assets/poster.jpg'
 
 
-const IMAGE_URL =
-  "https://png.pngtree.com/thumb_back/fh260/background/20240103/pngtree-luminous-vector-background-with-abstract-white-texture-for-creative-designs-image_13880263.png";
+const IMAGE_URL = Poster;
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [showOtpModal, setShowOtpModal] = useState(false);
-  const [isOtpLoading, setIsOtpLoading] = useState(false);
-  const [userTempData, setUserTempData] = useState(null);
 
 
   // const dispatch = useDispatch();
   const [login, {isLoading, error}] = useLoginMutation();
 
   const navigate = useNavigate();
-
-   const isDevelopmentMode = process.env.NODE_ENV === 'development';
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -59,8 +51,9 @@ const Login = () => {
         className="w-full md:w-1/2 h-64 md:h-screen"
         style={{
           backgroundImage: `url(${IMAGE_URL})`,
-          backgroundSize: "cover",
+          backgroundSize: "contain",
           backgroundPosition: "center",
+          backgroundRepeat: "no-repeat"
         }}
       ></div>
 
