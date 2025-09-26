@@ -1,19 +1,17 @@
-// src/pages/BillingUserPage.jsx
 import React from 'react';
 import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import BillingUserCard from '../Components/BillingUserCard';
 import CustomizableTable from '../Components/CustomizableTable'; // Your original table
 import mockData from '../Data/MockData.json';
 
-const { billingUsersData, ordersData } = mockData;
+const { ordersData } = mockData;
 
 const BillingUserPage = () => {
   const { userId } = useParams();
   const location = useLocation();
   const navigate = useNavigate();
 
-  const billingUser = location.state?.billingUser || 
-    billingUsersData.find(user => user.id === userId);
+  const billingUser = location.state?.billingUser;
 
   const userOrders = ordersData.filter(order => order.billingUserId === userId);
 

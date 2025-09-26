@@ -1,6 +1,6 @@
 // components/BillingUsersPage.jsx
 import React, { useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import SearchBar from '../Components/SearchBar';
 import CustomizableTable from '../Components/CustomizableTable';
 import { useGetAllBillingUsersForAdminQuery } from '../features/billingUser/BillingUserAPI';
@@ -17,15 +17,17 @@ const allColumns = [
 
 const BillingUsersPage = () => {
   const { eventId } = useParams();
+  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
 
-  const { data, error, isLoading, refetch } = useGetAllBillingUsersForAdminQuery(eventId);
+  const { data, error, isLoading, refetch } = useGetAllBillingUsersForAdminQuery();
 
   const billingUsersData = data?.data?.billingUsers || [];
 
   const handleRowClick = (billingUser) => {
     // Navigate to billing user details or handle row click
     console.log('Clicked billing user:', billingUser);
+    navigate(`/billingUsers/${billingUser.billing_user_id}`, { state: { billingUser } });
   };
 
   // Loading state
@@ -269,22 +271,7 @@ const BillingUsersPage = () => {
         </div>
       </div>
 
-      {/* Enhanced Table */}
-      <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/50 overflow-hidden">
-        <div className="bg-gradient-to-r from-slate-800 via-slate-700 to-slate-900 px-8 py-6">
-          <div className="flex items-center space-x-4">
-            <div className="p-3 bg-white/10 rounded-xl">
-              <Sparkles className="w-6 h-6 text-white" />
-            </div>
-            <div>
-              <h3 className="text-2xl font-black text-white">User Directory</h3>
-              <p className="text-slate-300 font-medium">
-                {billingUsersData.length} users • Click any row to view details
-              </p>
-            </div>
-          </div>
-        </div>
-
+      <div>
         <div className="relative">
           <div className="absolute inset-0 bg-gradient-to-br from-blue-50/50 to-purple-50/50"></div>
           <div className="relative z-10">

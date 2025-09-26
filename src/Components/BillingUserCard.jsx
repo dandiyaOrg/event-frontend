@@ -13,27 +13,13 @@ const BillingUserCard = ({ billingUser }) => {
     );
   }
 
-  const getStatusColor = (status) => {
-    switch (status.toLowerCase()) {
-      case 'active':
-        return 'bg-green-100 text-green-800 border-green-200';
-      case 'inactive':
-        return 'bg-red-100 text-red-800 border-red-200';
-      case 'pending':
-        return 'bg-yellow-100 text-yellow-800 border-yellow-200';
-      default:
-        return 'bg-gray-100 text-gray-800 border-gray-200';
-    }
-  };
-
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
       {/* Header */}
       <div className="bg-gradient-to-r from-gray-800 to-gray-700 px-6 py-6">
         <div className="flex justify-between items-center">
           <h2 className="text-2xl font-bold text-white">Billing User Details</h2>
-          <span className={`px-3 py-1 rounded-full text-sm font-medium border ${getStatusColor(billingUser.status)}`}>
-            {billingUser.status}
+          <span className="px-3 py-1 rounded-full text-sm font-medium border">
           </span>
         </div>
       </div>
