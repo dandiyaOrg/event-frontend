@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import {
   ArrowLeft,
   Save,
@@ -13,22 +13,24 @@ import {
   Sparkles
 } from "lucide-react";
 import InputField from "../Components/InputField";
-// import { useCreateGlobalPassMutation } from "../features/passTable/PassTableApi"; // Update to use global pass API
+import { useCreatePassMutation } from "../features/passTable/PassTableApi"; 
 
 const GlobalPassCreate = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const state = location.state;
+  const eventId = state;
   const [errors, setErrors] = useState({});
 
-  // Use the create global pass mutation
-//   const [createGlobalPass, { isLoading: isSubmitting }] = " ";
+  const [createGlobalPass, { isLoading, isSubmitting }] = useCreatePassMutation();
 
   const [formData, setFormData] = useState({
+    event_id: eventId,
     category: "",
     total_price: "",
     discount_percentage: "",
     is_active: false,
-    description: "", // Additional field for global passes
-    validity_days: "", // How long the pass is valid
+    validity_days: "", 
   });
 
   const handleChange = (e) => {
@@ -76,10 +78,6 @@ const GlobalPassCreate = () => {
         "Discount percentage must be between 0 and 100";
     }
 
-    if (!formData.description.trim()) {
-      newErrors.description = "Description is required for global passes";
-    }
-
     if (!formData.validity_days) {
       newErrors.validity_days = "Validity period is required";
     } else if (parseInt(formData.validity_days) <= 0) {
@@ -108,12 +106,13 @@ const GlobalPassCreate = () => {
     try {
       // Prepare data for global pass API
       const globalPassData = {
+        event_id: eventId,
         category: formData.category.trim(),
         total_price: parseFloat(formData.total_price),
         discount_percentage: parseFloat(formData.discount_percentage) || 0,
         is_active: formData.is_active,
-        description: formData.description.trim(),
-        validity_days: parseInt(formData.validity_days),
+        validity: parseInt(formData.validity_days),
+        is_global: true,
       };
 
       console.log("Submitting global pass data:", globalPassData);
@@ -122,11 +121,7 @@ const GlobalPassCreate = () => {
       await createGlobalPass(globalPassData).unwrap();
 
       // Success - navigate back to global passes list
-      navigate("/global-passes", {
-        state: {
-          message: `Global pass "${formData.category}" has been created successfully!`,
-        },
-      });
+      navigate(-1);
     } catch (error) {
       console.error("Failed to create global pass:", error);
 
@@ -204,10 +199,7 @@ const GlobalPassCreate = () => {
               </div>
 
               {/* Category Dropdown */}
-              <div className="space-y-3">
-               
-
-                
+              <div className="space-y-3">  
 
                 {errors.category && (
                   <div className="flex items-center space-x-2 p-3 bg-red-50 rounded-lg border-l-4 border-red-400">
@@ -221,21 +213,115 @@ const GlobalPassCreate = () => {
                 )}
               </div>
 
-              {/* Description Field */}
-              <InputField
-                label="Pass Description"
-                name="description"
-                type="textarea"
-                icon={Ticket}
-                placeholder="Describe what this global pass includes and its benefits..."
-                value={formData.description}
-                handleChange={handleChange}
-                errors={errors}
-                required={true}
-                variant="filled"
-                helperText="Detailed description of global pass features and benefits"
-                rows={4}
-              />
+              <div className="space-y-3">
+                <label className="flex items-center space-x-2 text-sm font-semibold text-gray-800 mb-3">
+                  <Tag className="w-4 h-4 text-blue-500" />
+                  <span>Pass Category</span>
+                  <span className="text-red-500">*</span>
+                </label>
+
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none z-10">
+                    <Tag className="h-5 w-5 text-gray-400" />
+                  </div>
+                  <select
+                    name="category"
+                    value={formData.category}
+                    onChange={handleChange}
+                    className={`w-full pl-12 pr-10 py-4 bg-gradient-to-br from-white via-gray-50 to-gray-100 border-2 rounded-2xl transition-all duration-300 text-gray-900 font-semibold shadow-lg hover:shadow-xl focus:outline-none focus:bg-white appearance-none cursor-pointer backdrop-blur-sm ${
+                      errors.category
+                        ? "border-red-300 focus:border-red-500 focus:ring-4 focus:ring-red-500/20 hover:border-red-400"
+                        : "border-gray-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 hover:border-blue-300"
+                    } ${formData.category ? "text-gray-900" : "text-gray-500"}`}
+                    required
+                  >
+                    <option
+                      value=""
+                      disabled
+                      className="text-gray-400 font-normal bg-gray-50"
+                    >
+                      ✨ Select a pass category
+                    </option>
+                    <option
+                      value="Full Group"
+                      className="py-3 px-4 text-gray-900 font-medium bg-white hover:bg-blue-50 border-l-4 border-blue-500"
+                    >
+                      👥 Group - Multiple people pass
+                    </option>
+                    <option
+                      value="Full Stag Male"
+                      className="py-3 px-4 text-gray-900 font-medium bg-white hover:bg-green-50 border-l-4 border-green-500"
+                    >
+                      👨 Stag Male - Single male entry
+                    </option>
+                    <option
+                      value="Full Stag Female"
+                      className="py-3 px-4 text-gray-900 font-medium bg-white hover:bg-pink-50 border-l-4 border-pink-500"
+                    >
+                      👩 Stag Female - Single female entry
+                    </option>
+                    <option
+                      value="Full Couple"
+                      className="py-3 px-4 text-gray-900 font-medium bg-white hover:bg-purple-50 border-l-4 border-purple-500"
+                    >
+                      💑 Couple - Two person pass
+                    </option>
+                  </select>
+
+                  {/* Custom dropdown arrow */}
+                  <div className="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none">
+                    <div className="w-6 h-6 bg-blue-100 rounded-lg flex items-center justify-center">
+                      <svg
+                        className="w-4 h-4 text-blue-500"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          d="M19 9l-7 7-7-7"
+                        ></path>
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+
+                {errors.category && (
+                  <div className="flex items-center space-x-2 p-3 bg-red-50 rounded-lg border-l-4 border-red-400">
+                    <div className="w-5 h-5 bg-red-100 rounded-full flex items-center justify-center">
+                      <div className="w-2 h-2 bg-red-500 rounded-full"></div>
+                    </div>
+                    <p className="text-red-600 text-sm font-medium">
+                      {errors.category}
+                    </p>
+                  </div>
+                )}
+
+                <div className="flex items-center space-x-2 mt-2">
+                  <div className="w-4 h-4 bg-gray-100 rounded-full flex items-center justify-center">
+                    <div className="w-2 h-2 bg-gray-400 rounded-full"></div>
+                  </div>
+                  <p className="text-gray-500 text-xs font-medium">
+                    Current:{" "}
+                    {formData.category ? (
+                      <span className="text-blue-600 font-semibold">
+                        {formData.category}
+                      </span>
+                    ) : (
+                      <span className="text-gray-400">Not selected</span>
+                    )}
+                  </p>
+                </div>
+
+                <p className="text-xs text-gray-500 mt-1 flex items-center space-x-1">
+                  <span>💡</span>
+                  <span>
+                    Choose the appropriate category for this pass type
+                  </span>
+                </p>
+              </div>
 
               {/* Validity Days */}
               <InputField
@@ -243,13 +329,13 @@ const GlobalPassCreate = () => {
                 name="validity_days"
                 type="number"
                 icon={Globe}
-                placeholder="365"
+                placeholder="1"
                 value={formData.validity_days}
                 handleChange={handleChange}
                 errors={errors}
                 required={true}
-                min="1"
-                step="1"
+                min={1}
+                step={1}
                 variant="filled"
                 helperText="How many days this pass remains valid after purchase"
               />
@@ -332,14 +418,6 @@ const GlobalPassCreate = () => {
                             ).toFixed(2)}
                           </p>
                         )}
-                    </div>
-                  </div>
-                  <div className="mt-3 pt-3 border-t border-green-200">
-                    <div className="flex justify-between text-sm">
-                      <span className="text-green-700">Valid for:</span>
-                      <span className="font-semibold text-green-800">
-                        {formData.validity_days || 0} days
-                      </span>
                     </div>
                   </div>
                 </div>

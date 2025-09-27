@@ -3,6 +3,7 @@ import { ArrowLeft } from "lucide-react";
 import mockData from "../Data/MockData.json";
 import SubEvent from "../Components/SubEvent";
 import { useGetEventByIdQuery } from "../features/events/eventsApi";
+import GlobalPassTable from "../Components/GlobalPassTable";
 
 const EventDetails = () => {
   const { eventId } = useParams();
@@ -38,7 +39,7 @@ const EventDetails = () => {
   };
 
   const handleCreateGlobalPass = () => {
-    navigate(`/globalpass/create`);
+    navigate(`/globalpass/create`, { state: eventId });
   };
   return (
     <div className="min-h-screen bg-gray-50">
@@ -222,38 +223,35 @@ const EventDetails = () => {
             Create universal passes valid across all events
           </p>
         </div>
-      </div>
-      
-      
-    </div>
-    
- 
-   
-
-    {/* Action Buttons */}
-    <div className="flex flex-col sm:flex-row gap-4">
-      {/* Primary Create Button */}
-      <button
-        onClick={handleCreateGlobalPass}
-        className="group/btn relative overflow-hidden bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-700 hover:from-blue-700 hover:via-indigo-700 hover:to-purple-800 text-white font-bold px-8 py-4 rounded-2xl shadow-xl hover:shadow-2xl transform hover:scale-105 active:scale-95 transition-all duration-300 border border-blue-500/20"
-      >
-        {/* Button Background Animation */}
-        <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 transform -skew-x-12 -translate-x-full group-hover/btn:translate-x-full transition-transform duration-700"></div>
-        
-        {/* Button Content */}
-        <div className="relative flex items-center justify-center space-x-3">
-          <svg className="w-6 h-6 group-hover/btn:rotate-12 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-          </svg>
-          <span className="text-lg">Create Global Pass</span>
-          <div className="w-2 h-2 bg-white/60 rounded-full group-hover/btn:bg-white transition-colors duration-300"></div>
+        <div>
+          {/* Primary Create Button */}
+        <button
+          onClick={handleCreateGlobalPass}
+          className="group/btn relative overflow-hidden bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-700 hover:from-blue-700 hover:via-indigo-700 hover:to-purple-800 text-white font-bold px-8 py-4 rounded-2xl shadow-xl hover:shadow-2xl transform hover:scale-105 active:scale-95 transition-all duration-300 border border-blue-500/20"
+        >
+          {/* Button Background Animation */}
+          <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 transform -skew-x-12 -translate-x-full group-hover/btn:translate-x-full transition-transform duration-700"></div>
+          
+          {/* Button Content */}
+          <div className="relative flex items-center justify-center space-x-3">
+            <svg className="w-6 h-6 group-hover/btn:rotate-12 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+            </svg>
+            <span className="text-lg">Create Global Pass</span>
+            <div className="w-2 h-2 bg-white/60 rounded-full group-hover/btn:bg-white transition-colors duration-300"></div>
+          </div>
+          
+          {/* Glow Effect */}
+          <div className="absolute inset-0 bg-gradient-to-r from-blue-400 to-purple-600 rounded-2xl blur-lg opacity-30 group-hover/btn:opacity-50 transition-opacity duration-300 -z-10"></div>
+        </button>
         </div>
         
-        {/* Glow Effect */}
-        <div className="absolute inset-0 bg-gradient-to-r from-blue-400 to-purple-600 rounded-2xl blur-lg opacity-30 group-hover/btn:opacity-50 transition-opacity duration-300 -z-10"></div>
-      </button>
-
-      
+      </div>
+    </div>
+  
+    
+    <div className="flex flex-col sm:flex-row">
+      <GlobalPassTable data={event.passes_list} />
     </div>
 
    

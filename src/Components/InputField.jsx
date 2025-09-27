@@ -54,7 +54,7 @@ const InputField = ({
               ? 'border-red-500 bg-red-50' 
               : 'border-gray-300 hover:border-gray-400 focus:border-blue-500'
           } ${disabled ? 'bg-gray-100 cursor-not-allowed' : ''}`}
-          {...props}
+          
         />
         
         {name === 'password' && (
