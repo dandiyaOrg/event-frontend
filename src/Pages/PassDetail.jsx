@@ -21,7 +21,7 @@ import {
   Power,
   Edit3,
 } from "lucide-react";
-import PricingEditModal from "../components/PricingEditModal";
+import PricingEditModal from "../Components/PricingEditModal";
 
 const PassDetail = () => {
   const { eventId, subEventId, passId } = useParams();
