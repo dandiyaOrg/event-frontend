@@ -37,6 +37,9 @@ const EventDetails = () => {
     navigate(`/subevents/new`);
   };
 
+  const handleCreateGlobalPass = () => {
+    navigate(`/globalpass/create`);
+  };
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header with Back Button */}
@@ -162,49 +165,7 @@ const EventDetails = () => {
       </div>
     </div>
 
-    {/* Registration Stats Section (Enhanced) */}
-    {/* Uncomment when API is ready */}
-    {/*
-    <div className="relative p-6 bg-gradient-to-r from-blue-500 to-purple-600 rounded-2xl mb-8 text-white overflow-hidden">
-      <div className="absolute top-0 right-0 w-32 h-32 transform translate-x-8 -translate-y-8">
-        <div className="w-full h-full bg-white opacity-10 rounded-full"></div>
-      </div>
-      <div className="absolute bottom-0 left-0 w-24 h-24 transform -translate-x-4 translate-y-4">
-        <div className="w-full h-full bg-white opacity-10 rounded-full"></div>
-      </div>
-      
-      <h3 className="text-xl font-bold mb-6 relative z-10">Registration Status</h3>
-      <div className="grid grid-cols-3 gap-6 relative z-10">
-        <div className="text-center">
-          <div className="text-3xl font-black mb-1">{event.capacity}</div>
-          <div className="text-blue-100 text-sm font-medium">Total Capacity</div>
-        </div>
-        <div className="text-center">
-          <div className="text-3xl font-black mb-1 text-green-300">{event.totalRegistrations}</div>
-          <div className="text-blue-100 text-sm font-medium">Registered</div>
-        </div>
-        <div className="text-center">
-          <div className="text-3xl font-black mb-1 text-yellow-300">
-            {event.capacity - event.totalRegistrations}
-          </div>
-          <div className="text-blue-100 text-sm font-medium">Available</div>
-        </div>
-      </div>
-      
-      <div className="mt-6 relative z-10">
-        <div className="flex justify-between text-sm mb-2">
-          <span>Registration Progress</span>
-          <span>{Math.round((event.totalRegistrations / event.capacity) * 100)}%</span>
-        </div>
-        <div className="w-full bg-white bg-opacity-20 rounded-full h-3">
-          <div 
-            className="bg-gradient-to-r from-green-400 to-green-300 h-3 rounded-full transition-all duration-500 ease-out shadow-lg"
-            style={{ width: `${(event.totalRegistrations / event.capacity) * 100}%` }}
-          ></div>
-        </div>
-      </div>
-    </div>
-    */}
+    
 
     {/* Enhanced Description Section */}
     <div className="relative">
@@ -230,6 +191,74 @@ const EventDetails = () => {
   </div>
 </div>
 
+     {/* Global Pass Section */}
+<div className="relative overflow-hidden bg-gradient-to-br from-white via-blue-50/30 to-indigo-50/50 rounded-2xl shadow-xl border border-blue-100/50 backdrop-blur-sm mb-8 group hover:shadow-2xl transition-all duration-500">
+  {/* Animated Background Elements */}
+  <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-blue-400/20 to-indigo-500/20 rounded-full blur-2xl animate-pulse"></div>
+  <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-purple-400/20 to-pink-500/20 rounded-full blur-xl animate-pulse delay-1000"></div>
+  
+  {/* Main Content */}
+  <div className="relative z-10 p-8">
+    {/* Header Section */}
+    <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center space-x-4">
+        {/* Icon Container */}
+        <div className="relative">
+          <div className="flex items-center justify-center w-14 h-14 bg-gradient-to-br from-blue-500 via-indigo-600 to-purple-600 rounded-2xl shadow-lg group-hover:scale-110 transition-transform duration-300">
+            <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9v-9m0-9v9" />
+            </svg>
+          </div>
+          {/* Glow effect */}
+          <div className="absolute inset-0 bg-gradient-to-br from-blue-400 to-purple-600 rounded-2xl blur-lg opacity-30 group-hover:opacity-50 transition-opacity duration-300"></div>
+        </div>
+        
+        {/* Title and Description */}
+        <div>
+          <h3 className="text-2xl font-black bg-gradient-to-r from-slate-800 via-blue-700 to-indigo-800 bg-clip-text text-transparent mb-1">
+            Global Pass
+          </h3>
+          <p className="text-slate-600 font-medium text-sm">
+            Create universal passes valid across all events
+          </p>
+        </div>
+      </div>
+      
+      
+    </div>
+    
+ 
+   
+
+    {/* Action Buttons */}
+    <div className="flex flex-col sm:flex-row gap-4">
+      {/* Primary Create Button */}
+      <button
+        onClick={handleCreateGlobalPass}
+        className="group/btn relative overflow-hidden bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-700 hover:from-blue-700 hover:via-indigo-700 hover:to-purple-800 text-white font-bold px-8 py-4 rounded-2xl shadow-xl hover:shadow-2xl transform hover:scale-105 active:scale-95 transition-all duration-300 border border-blue-500/20"
+      >
+        {/* Button Background Animation */}
+        <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 transform -skew-x-12 -translate-x-full group-hover/btn:translate-x-full transition-transform duration-700"></div>
+        
+        {/* Button Content */}
+        <div className="relative flex items-center justify-center space-x-3">
+          <svg className="w-6 h-6 group-hover/btn:rotate-12 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+          </svg>
+          <span className="text-lg">Create Global Pass</span>
+          <div className="w-2 h-2 bg-white/60 rounded-full group-hover/btn:bg-white transition-colors duration-300"></div>
+        </div>
+        
+        {/* Glow Effect */}
+        <div className="absolute inset-0 bg-gradient-to-r from-blue-400 to-purple-600 rounded-2xl blur-lg opacity-30 group-hover/btn:opacity-50 transition-opacity duration-300 -z-10"></div>
+      </button>
+
+      
+    </div>
+
+   
+  </div>
+</div>
 
 
         {/* Sub Events Section */}

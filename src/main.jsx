@@ -25,6 +25,7 @@ import PassTable from "./Components/PassTable.jsx";
 import PassCreateForm from "./Pages/PassCreateForm.jsx";
 import PassDetail from "./Pages/PassDetail.jsx";
 import PassEditForm from "./Pages/PassEditForm.jsx"
+import GlobalPassCreate from "./Pages/GlobalPassCreate.jsx";
 import Employees from "./Pages/Employees";
 import EmployeeDetail from "./Pages/EmployeeDetail.jsx";
 import EmployeeDetailForm from "./Pages/EmployeeDetailForm";
@@ -104,6 +105,12 @@ const router = createBrowserRouter(
           path="/events/:eventId/subevents/:subEventId/passes/:passId/edit"
           element={<PassEditForm/>}
         />
+        <Route 
+        path="/globalpass/create"
+        element={<GlobalPassCreate/>}
+        />
+
+      
 
         {/* Employee Routes */}
         <Route path="/employees" element={<Employees />} />

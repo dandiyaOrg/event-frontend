@@ -27,10 +27,7 @@ const BillingUserCard = ({ billingUser }) => {
       {/* Content */}
       <div className="p-6">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <div className="space-y-1">
-            <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">User ID</label>
-            <p className="text-lg font-semibold text-gray-900">{billingUser.id}</p>
-          </div>
+          
           
           <div className="space-y-1">
             <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Name</label>
@@ -44,28 +41,28 @@ const BillingUserCard = ({ billingUser }) => {
           
           <div className="space-y-1">
             <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Phone</label>
-            <p className="text-lg font-medium text-gray-700">{billingUser.phone}</p>
+            <p className="text-lg font-medium text-gray-700">{billingUser.mobile_no}</p>
           </div>
           
           <div className="space-y-1">
-            <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Company</label>
-            <p className="text-lg font-medium text-gray-700">{billingUser.company}</p>
+            <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Whatsapp</label>
+            <p className="text-lg font-medium text-gray-700">{billingUser.whatsapp}</p>
           </div>
           
           <div className="space-y-1">
-            <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Total Orders</label>
-            <p className="text-lg font-semibold text-gray-900">{billingUser.totalOrders}</p>
+            <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Address</label>
+            <p className="text-lg font-semibold text-gray-900">{billingUser.address}</p>
           </div>
           
           <div className="space-y-1">
-            <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Total Spent</label>
-            <p className="text-lg font-semibold text-green-600">₹{billingUser.totalSpent?.toLocaleString()}</p>
+            <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Gender</label>
+            <p className="text-lg font-semibold text-green-600">{billingUser.gender}</p>
           </div>
           
           <div className="space-y-1">
-            <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Registration Date</label>
+            <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Age</label>
             <p className="text-lg font-medium text-gray-700">
-              {new Date(billingUser.registrationDate).toLocaleDateString('en-IN')}
+              {billingUser.age} years
             </p>
           </div>
         </div>

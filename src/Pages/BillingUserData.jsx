@@ -2,19 +2,21 @@ import React from 'react';
 import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import BillingUserCard from '../Components/BillingUserCard';
 import CustomizableTable from '../Components/CustomizableTable'; // Your original table
-import mockData from '../Data/MockData.json';
+import { useGetAllBillingUsersForAdminQuery } from '../features/billingUser/BillingUserAPI';
 
-const { ordersData } = mockData;
 
-const BillingUserPage = () => {
+const BillingUserData = () => {
   const { userId } = useParams();
   const location = useLocation();
   const navigate = useNavigate();
 
-  const billingUser = location.state?.billingUser;
+const { data: billingUsers } = useGetAllBillingUsersForAdminQuery();
 
-  const userOrders = ordersData.filter(order => order.billingUserId === userId);
+  // Find the billing user from the fetched data or location state
+  const billingUser = location.state?.billingUser || billingUsers?.find(user => user.id === userId);
 
+  // Sample orders data - replace with actual data fetching logic if needed
+  const userOrders = billingUser?.orders || []; 
   // Define columns for orders table
   const orderColumns = [
     { key: 'id', label: 'Order ID' },
@@ -127,4 +129,4 @@ const BillingUserPage = () => {
   );
 };
 
-export default BillingUserPage;
+export default BillingUserData;

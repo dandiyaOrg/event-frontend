@@ -1,39 +1,50 @@
 // components/PassDetail.jsx
-import React from 'react';
-import { useParams, useNavigate, useLocation } from 'react-router-dom';
-import { useGetPassByIdQuery,useDeletePassMutation } from '../features/passTable/PassTableApi';
-import { 
-  ArrowLeft, 
-  Edit3, 
-  Trash2, 
-  Tag, 
-  DollarSign, 
+import React, { useState } from "react";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
+import {
+  useGetPassByIdQuery,
+  useTogglePassStatusMutation,
+  useUpdatePassMutation, // Add this mutation
+} from "../features/passTable/PassTableApi";
+import {
+  ArrowLeft,
+  Tag,
   Percent,
   CheckCircle,
   XCircle,
-  Calendar,
   Clock,
   Info,
   Activity,
   CreditCard,
-  Users,
   TrendingUp,
-  IndianRupee
-} from 'lucide-react';
+  IndianRupee,
+  Power,
+  Edit3,
+} from "lucide-react";
+import PricingEditModal from "../components/PricingEditModal";
 
 const PassDetail = () => {
   const { eventId, subEventId, passId } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
-  
+
+  // Local state for optimistic UI updates and modal
+  const [localPassData, setLocalPassData] = useState(null);
+  const [isPricingModalOpen, setIsPricingModalOpen] = useState(false);
+
   // Get pass data from location state or API
   const passFromState = location.state?.pass;
-  const { data, error, isLoading } = useGetPassByIdQuery(passId, {
-    skip: !!passFromState // Skip API call if we have data from state
+  const { data, error, isLoading, refetch } = useGetPassByIdQuery(passId, {
+    skip: !!passFromState, // Skip API call if we have data from state
   });
-   const [deletePass, { isLoading: isDeleting }] = useDeletePassMutation();
 
-  const pass = passFromState || data?.data || data;
+  const [togglePassStatus, { isLoading: isToggling }] =
+    useTogglePassStatusMutation();
+  const [updatePassPricing, { isLoading: isUpdatingPricing }] =
+    useUpdatePassMutation(); // Add this mutation hook
+
+  // Use local state if available, otherwise use API data or state data
+  const pass = localPassData || passFromState || data?.data || data;
 
   // Handle loading state
   if (isLoading) {
@@ -44,7 +55,9 @@ const PassDetail = () => {
             <div className="w-20 h-20 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin mx-auto mb-6"></div>
             <div className="absolute inset-0 w-20 h-20 border-4 border-transparent border-r-purple-400 rounded-full animate-ping mx-auto"></div>
           </div>
-          <h3 className="text-xl font-bold text-slate-800 mb-2">Loading Pass Details</h3>
+          <h3 className="text-xl font-bold text-slate-800 mb-2">
+            Loading Pass Details
+          </h3>
           <p className="text-slate-600">Fetching pass information...</p>
         </div>
       </div>
@@ -63,10 +76,13 @@ const PassDetail = () => {
             Pass Not Found
           </h3>
           <p className="text-red-600 mb-6">
-            {error?.data?.message || 'Could not load pass details. Please try again.'}
+            {error?.data?.message ||
+              "Could not load pass details. Please try again."}
           </p>
-          <button 
-            onClick={() => navigate(`/events/${eventId}/subevents/${subEventId}/passes`)}
+          <button
+            onClick={() =>
+              navigate(`/events/${eventId}/subevents/${subEventId}/passes`)
+            }
             className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl font-semibold transform hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-xl"
           >
             Back to Passes
@@ -76,34 +92,84 @@ const PassDetail = () => {
     );
   }
 
-  const handleEdit = () => {
-    navigate(`/events/${eventId}/subevents/${subEventId}/passes/${passId}/edit`, {
-      state: { pass }
-    });
-  };
-
-const handleDelete = async () => {
-  if (window.confirm(`Are you sure you want to delete "${pass.category}" pass?`)) {
+  const handleToggleStatus = async () => {
     try {
-      await deletePass(pass.pass_id).unwrap();
-      navigate(`/events/${eventId}/subevents/${subEventId}/passes`, {
-        state: { message: 'Pass deleted successfully!' }
+      // Optimistic update - immediately update UI
+      setLocalPassData({
+        ...pass,
+        is_active: !pass.is_active,
       });
-    } catch (err) {
-      console.error('Failed to delete pass:', err);
-      alert('Failed to delete pass. Please try again.');
-    }
-  }
-};
 
-  const handleBack = () => {
-    navigate(`/events/${eventId}/subevents/${subEventId}/passes`);
+      // Call the API with proper error handling
+      const result = await togglePassStatus(pass.pass_id).unwrap();
+
+      // Show success message from server
+      alert(
+        result.message ||
+          `Pass ${
+            result.data.is_active ? "activated" : "deactivated"
+          } successfully!`
+      );
+
+      // Refetch to ensure data consistency
+      if (refetch) {
+        refetch();
+      }
+    } catch (err) {
+      console.error("Failed to toggle pass status:", err);
+
+      // Revert optimistic update on error
+      setLocalPassData(null);
+
+      // Handle different error types
+      if (err.status === 404) {
+        alert(
+          "Pass not found or toggle endpoint not available. Please check the pass ID."
+        );
+      } else if (err.status === "PARSING_ERROR") {
+        alert(
+          "Server error: Unable to process the request. Please try again later."
+        );
+      } else {
+        alert(
+          err?.data?.message ||
+            "Failed to update pass status. Please try again."
+        );
+      }
+    }
   };
 
-  // Calculate savings
-  const totalPrice = parseFloat(pass.total_price || 0);
-  const finalPrice = parseFloat(pass.final_price || 0);
-  const savings = totalPrice - finalPrice;
+  const handleUpdatePricing = async (pricingData) => {
+    try {
+      const passData = {
+        total_price: pricingData.total_price,
+        discount_percentage: pricingData.discount_percentage,
+      };
+      const result = await updatePassPricing({
+        passId: pass.pass_id,
+        passData,
+      }).unwrap();
+
+      // Update local state with new pricing data
+      setLocalPassData({
+        ...pass,
+        total_price: pricingData.total_price,
+        discount_percentage: pricingData.discount_percentage,
+        final_price:
+          pricingData.total_price -
+          (pricingData.total_price * pricingData.discount_percentage) / 100,
+      });
+
+      alert("Pricing updated successfully!");
+      setIsPricingModalOpen(false);
+    } catch (error) {
+      console.error("Failed to update pricing:", error);
+      throw error; // Re-throw to let the modal handle it
+    }
+  };
+  const handleBack = () => {
+    navigate(`/events/${eventId}/subevents/${subEventId}`);
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-purple-50/30 p-6">
@@ -119,7 +185,7 @@ const handleDelete = async () => {
               <span className="font-semibold">Back to Pass Management</span>
             </button>
           </div>
-          
+
           {/* Hero Section */}
           <div className="relative overflow-hidden bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-700 rounded-3xl p-8 shadow-2xl">
             <div className="absolute inset-0 bg-black/10"></div>
@@ -140,27 +206,22 @@ const handleDelete = async () => {
                 </div>
               </div>
 
-              {/* Action Buttons */}
+              {/* Status Badge */}
               <div className="flex items-center space-x-4">
-                <button
-                  onClick={handleEdit}
-                  className="group flex items-center space-x-3 bg-white/20 backdrop-blur-sm hover:bg-white/30 text-white px-6 py-4 rounded-2xl font-bold transition-all duration-300 shadow-xl hover:shadow-2xl transform hover:scale-105"
+                <div
+                  className={`flex items-center space-x-3 px-6 py-4 rounded-2xl font-bold text-lg shadow-xl ${
+                    pass.is_active
+                      ? "bg-green-500/90 text-white"
+                      : "bg-red-500/90 text-white"
+                  }`}
                 >
-                  <div className="p-2 bg-white/20 rounded-xl group-hover:rotate-12 transition-transform duration-300">
-                    <Edit3 className="w-5 h-5" />
-                  </div>
-                  <span>Edit Pass</span>
-                </button>
-                
-                <button
-                  onClick={handleDelete}
-                  className="group flex items-center space-x-3 bg-red-500/90 hover:bg-red-600 text-white px-6 py-4 rounded-2xl font-bold transition-all duration-300 shadow-xl hover:shadow-2xl transform hover:scale-105"
-                >
-                  <div className="p-2 bg-white/20 rounded-xl group-hover:rotate-12 transition-transform duration-300">
-                    <Trash2 className="w-5 h-5" />
-                  </div>
-                  <span>Delete Pass</span>
-                </button>
+                  {pass.is_active ? (
+                    <CheckCircle className="w-6 h-6" />
+                  ) : (
+                    <XCircle className="w-6 h-6" />
+                  )}
+                  <span>{pass.is_active ? "Active" : "Inactive"}</span>
+                </div>
               </div>
             </div>
           </div>
@@ -178,12 +239,16 @@ const handleDelete = async () => {
                     <CreditCard className="w-6 h-6 text-white" />
                   </div>
                   <div>
-                    <h3 className="text-2xl font-black text-white">Pass Information</h3>
-                    <p className="text-slate-300 font-medium">Complete pass details and pricing</p>
+                    <h3 className="text-2xl font-black text-white">
+                      Pass Information
+                    </h3>
+                    <p className="text-slate-300 font-medium">
+                      Complete pass details and pricing
+                    </p>
                   </div>
                 </div>
               </div>
-              
+
               <div className="p-8">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                   {/* Category */}
@@ -193,23 +258,41 @@ const handleDelete = async () => {
                         <Tag className="w-6 h-6 text-white" />
                       </div>
                       <div>
-                        <p className="text-sm font-bold text-blue-600 uppercase tracking-wide">Category</p>
-                        <p className="text-2xl font-black text-slate-900">{pass.category}</p>
+                        <p className="text-sm font-bold text-blue-600 uppercase tracking-wide">
+                          Category
+                        </p>
+                        <p className="text-2xl font-black text-slate-900">
+                          {pass.category}
+                        </p>
                       </div>
                     </div>
                   </div>
 
                   {/* Total Price */}
-                  <div className="group">
+                  <div className="group relative">
                     <div className="flex items-center space-x-4 p-6 bg-gradient-to-r from-emerald-50 to-emerald-100 rounded-2xl hover:shadow-lg transition-all duration-300">
                       <div className="p-3 bg-emerald-500 rounded-xl shadow-lg">
                         <IndianRupee className="w-6 h-6 text-white" />
                       </div>
                       <div>
-                        <p className="text-sm font-bold text-emerald-600 uppercase tracking-wide">Original Price</p>
-                        <p className="text-2xl font-black text-slate-900">{pass.total_price}</p>
+                        <p className="text-sm font-bold text-emerald-600 uppercase tracking-wide">
+                          Original Price
+                        </p>
+                        <p className="text-2xl font-black text-slate-900">
+                          {pass.total_price}
+                        </p>
                       </div>
                     </div>
+
+                    {/* Edit Button - Shows on Hover */}
+                    <button
+                      onClick={() => setIsPricingModalOpen(true)}
+                      className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-200 p-2 bg-white/90 hover:bg-white rounded-lg shadow-md hover:shadow-lg transform hover:scale-105"
+                      title="Edit pricing"
+                      disabled={isUpdatingPricing}
+                    >
+                      <Edit3 className="w-4 h-4 text-emerald-600" />
+                    </button>
                   </div>
 
                   {/* Discount */}
@@ -219,8 +302,12 @@ const handleDelete = async () => {
                         <Percent className="w-6 h-6 text-white" />
                       </div>
                       <div>
-                        <p className="text-sm font-bold text-orange-600 uppercase tracking-wide">Discount</p>
-                        <p className="text-2xl font-black text-slate-900">{parseFloat(pass.discount_percentage || 0)}%</p>
+                        <p className="text-sm font-bold text-orange-600 uppercase tracking-wide">
+                          Discount
+                        </p>
+                        <p className="text-2xl font-black text-slate-900">
+                          {parseFloat(pass.discount_percentage || 0)}%
+                        </p>
                       </div>
                     </div>
                   </div>
@@ -232,96 +319,158 @@ const handleDelete = async () => {
                         <TrendingUp className="w-6 h-6 text-white" />
                       </div>
                       <div>
-                        <p className="text-sm font-bold text-purple-600 uppercase tracking-wide">Final Price</p>
-                        <p className="text-2xl font-black text-slate-900">{pass.final_price}</p>
+                        <p className="text-sm font-bold text-purple-600 uppercase tracking-wide">
+                          Final Price
+                        </p>
+                        <p className="text-2xl font-black text-slate-900">
+                          {pass.final_price}
+                        </p>
                       </div>
                     </div>
                   </div>
                 </div>
-
-               
               </div>
             </div>
           </div>
 
-          {/* Right Column - Status & Actions */}
+          {/* Right Column - Toggle Control */}
           <div className="space-y-8">
-            {/* Status Card */}
+            {/* Toggle Control Card */}
             <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/50 overflow-hidden">
               <div className="bg-gradient-to-r from-slate-800 via-slate-700 to-slate-900 px-6 py-4">
                 <div className="flex items-center space-x-3">
                   <div className="p-2 bg-white/10 rounded-lg">
                     <Activity className="w-5 h-5 text-white" />
                   </div>
-                  <h3 className="text-xl font-black text-white">Pass Status</h3>
+                  <h3 className="text-xl font-black text-white">
+                    Pass Control
+                  </h3>
                 </div>
               </div>
-              
+
               <div className="p-6">
-                <div className="flex items-center justify-between">
-                  <span className="text-slate-600 font-bold">Current Status</span>
-                  <div className={`flex items-center space-x-3 px-4 py-3 rounded-2xl font-bold text-sm ${
-                    pass.is_active 
-                      ? 'bg-green-100 text-green-800 border-2 border-green-200' 
-                      : 'bg-red-100 text-red-800 border-2 border-red-200'
-                  }`}>
-                    {pass.is_active ? (
-                      <CheckCircle className="w-5 h-5" />
-                    ) : (
-                      <XCircle className="w-5 h-5" />
-                    )}
-                    <span className="text-lg">
-                      {pass.is_active ? 'Active' : 'Inactive'}
-                    </span>
+                {/* Toggle Switch */}
+                <div className="bg-slate-50 rounded-2xl p-6 border-2 border-slate-100">
+                  <div className="flex items-center justify-between mb-4">
+                    <div>
+                      <h4 className="font-bold text-slate-900 text-lg">
+                        Toggle Status
+                      </h4>
+                      <p className="text-slate-600 text-sm mt-1">
+                        Click to activate/deactivate this pass
+                      </p>
+                    </div>
+                    <div className="flex items-center space-x-3">
+                      <span
+                        className={`text-sm font-semibold ${
+                          !pass.is_active ? "text-slate-900" : "text-slate-500"
+                        }`}
+                      >
+                        Inactive
+                      </span>
+
+                      {/* Custom Toggle Switch */}
+                      <div className="relative">
+                        <button
+                          onClick={handleToggleStatus}
+                          disabled={isToggling}
+                          className={`relative inline-flex items-center h-8 w-16 rounded-full transition-colors duration-300 focus:outline-none focus:ring-4 focus:ring-blue-300/50 disabled:cursor-not-allowed ${
+                            pass.is_active
+                              ? "bg-green-500 hover:bg-green-600"
+                              : "bg-slate-300 hover:bg-slate-400"
+                          } ${isToggling ? "opacity-50" : ""}`}
+                        >
+                          <span
+                            className={`inline-block w-6 h-6 bg-white rounded-full shadow-lg transform transition-transform duration-300 ${
+                              pass.is_active ? "translate-x-8" : "translate-x-1"
+                            }`}
+                          />
+                          {isToggling && (
+                            <div className="absolute inset-0 flex items-center justify-center">
+                              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                            </div>
+                          )}
+                        </button>
+                      </div>
+
+                      <span
+                        className={`text-sm font-semibold ${
+                          pass.is_active ? "text-slate-900" : "text-slate-500"
+                        }`}
+                      >
+                        Active
+                      </span>
+                    </div>
                   </div>
-                </div>
-                
-                <div className="mt-6 p-4 bg-slate-50 rounded-xl">
-                  <p className="text-slate-600 text-sm font-medium">
-                    {pass.is_active 
-                      ? '✅ This pass is currently active and available for purchase.'
-                      : '⚠️ This pass is inactive and not available for purchase.'
-                    }
-                  </p>
+
+                  {/* Status Message */}
+                  <div className="mt-4 p-4 bg-slate-100 rounded-xl">
+                    <p className="text-slate-600 text-sm font-medium flex items-center">
+                      {isToggling ? (
+                        <>
+                          <div className="w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin mr-2"></div>
+                          Updating pass status...
+                        </>
+                      ) : (
+                        <>
+                          {pass.is_active
+                            ? "✅ This pass is currently active and available for purchase."
+                            : "⚠️ This pass is inactive and not available for purchase."}
+                        </>
+                      )}
+                    </p>
+                  </div>
                 </div>
               </div>
             </div>
 
-           
-            {/* Additional Info Card */}
+            {/* Pricing Quick Actions Card */}
             <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/50 overflow-hidden">
               <div className="bg-gradient-to-r from-slate-800 via-slate-700 to-slate-900 px-6 py-4">
-                <div className="flex items-center space-x-3">
-                  <div className="p-2 bg-white/10 rounded-lg">
-                    <Clock className="w-5 h-5 text-white" />
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-3">
+                    <div className="p-2 bg-white/10 rounded-lg">
+                      <IndianRupee className="w-5 h-5 text-white" />
+                    </div>
+                    <h3 className="text-xl font-black text-white">
+                      Pricing Actions
+                    </h3>
                   </div>
-                  <h3 className="text-xl font-black text-white">Pass Details</h3>
                 </div>
               </div>
-              
-              <div className="p-6 space-y-4">
-                <div className="flex items-center justify-between py-3 border-b border-slate-200">
-                  <span className="text-slate-600 font-semibold">Pass ID</span>
-                  <span className="text-slate-900 font-bold">{pass.pass_id}</span>
-                </div>
-                
-                <div className="flex items-center justify-between py-3 border-b border-slate-200">
-                  <span className="text-slate-600 font-semibold">Created</span>
-                  <span className="text-slate-900 font-bold">
-                    {new Date().toLocaleDateString('en-IN')}
+
+              <div className="p-6">
+                <button
+                  onClick={() => setIsPricingModalOpen(true)}
+                  disabled={isUpdatingPricing}
+                  className="w-full flex items-center justify-center space-x-3 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white px-6 py-4 rounded-2xl font-bold transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                >
+                  <Edit3 className="w-5 h-5" />
+                  <span>
+                    {isUpdatingPricing ? "Updating..." : "Edit Pricing"}
                   </span>
-                </div>
-                
-                <div className="flex items-center justify-between py-3">
-                  <span className="text-slate-600 font-semibold">Last Updated</span>
-                  <span className="text-slate-900 font-bold">
-                    {new Date().toLocaleDateString('en-IN')}
-                  </span>
-                </div>
+                </button>
+
+                <p className="text-slate-600 text-sm mt-3 text-center">
+                  Update original price and discount percentage
+                </p>
               </div>
             </div>
           </div>
         </div>
+
+        {/* Pricing Edit Modal */}
+        <PricingEditModal
+          isOpen={isPricingModalOpen}
+          onClose={() => setIsPricingModalOpen(false)}
+          currentPricing={{
+            total_price: pass.total_price,
+            discount_percentage: pass.discount_percentage || 0,
+          }}
+          onSave={handleUpdatePricing}
+          isLoading={isUpdatingPricing}
+          title="Edit Pass Pricing"
+        />
       </div>
     </div>
   );

@@ -35,26 +35,37 @@ export const subEventsApi = apiSlice.injectEndpoints({
         }),
 
         // Update subevent with optional image upload
-        updateSubEvent: builder.mutation({
-            query: ({ subeventId, subeventData }) => {
-                const formData = new FormData();
-                
-                // Append all fields to FormData
-                Object.keys(subeventData).forEach(key => {
-                    if (key === 'image' && subeventData[key]) {
-                        formData.append('image', subeventData[key]);
-                    } else if (subeventData[key] !== undefined && subeventData[key] !== null) {
-                        formData.append(key, subeventData[key]);
-                    }
-                });
+updateSubEvent: builder.mutation({
+  query: ({ subeventId, subeventData }) => {
+    console.log('RTK Query - Received data type:', subeventData.constructor.name);
+    
+    // Check if it's FormData or regular object
+    if (subeventData instanceof FormData) {
+      console.log('Sending FormData');
+      return {
+        url: `/subevent/${subeventId}`,
+        method: 'PUT',
+        body: subeventData,
+      };
+    } else {
+      console.log('Sending JSON:', subeventData);
+      return {
+        url: `/subevent/${subeventId}`,
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(subeventData),
+      };
+    }
+  },
+  invalidatesTags: (result, error, { subeventId }) => [
+    { type: 'SubEvent', id: subeventId },
+    { type: 'SubEvent', id: 'LIST' }
+  ],
+}),
 
-                return {
-                    url: `/subevent/${subeventId}`,
-                    method: 'PUT',
-                    body: formData,
-                };
-            },
-        }),
+
 
         // Delete subevent
         deleteSubEvent: builder.mutation({

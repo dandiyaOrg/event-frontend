@@ -32,8 +32,9 @@ export const passTableApi = apiSlice.injectEndpoints({
 
     togglePassStatus: builder.mutation({
       query: (passId) => ({
-        url: `/toggle/${passId}`,
-        method: "PUT",
+        url: `pass/toggle/${passId}`,
+        method: "PATCH",
+        body: {},
       }),
     }),
 
